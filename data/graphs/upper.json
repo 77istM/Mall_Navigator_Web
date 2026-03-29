@@ -1,0 +1,133 @@
+{
+  "nodes": {
+    "stairs_from_ground": {
+      "x": 770,
+      "y": 660,
+      "floor": 2,
+      "label": "Escalator \u2193 Ground Floor",
+      "type": "stairs"
+    },
+    "jct_east_bottom": {
+      "x": 700,
+      "y": 550,
+      "floor": 2,
+      "label": "East Corridor (Bottom)",
+      "type": "corridor"
+    },
+    "jct_east_top": {
+      "x": 700,
+      "y": 200,
+      "floor": 2,
+      "label": "East Corridor (Top)",
+      "type": "corridor"
+    },
+    "jct_top": {
+      "x": 400,
+      "y": 200,
+      "floor": 2,
+      "label": "North Junction",
+      "type": "corridor"
+    },
+    "jct_bottom": {
+      "x": 400,
+      "y": 550,
+      "floor": 2,
+      "label": "South Junction",
+      "type": "corridor"
+    },
+    "jct_center": {
+      "x": 400,
+      "y": 380,
+      "floor": 2,
+      "label": "Central Junction",
+      "type": "corridor"
+    },
+    "nandos": {
+      "x": 555,
+      "y": 229,
+      "floor": 2,
+      "label": "Nando's",
+      "type": "store"
+    },
+    "leon": {
+      "x": 632,
+      "y": 661,
+      "floor": 2,
+      "label": "Leon",
+      "type": "store"
+    },
+    "wagamama": {
+      "x": 750,
+      "y": 273,
+      "floor": 2,
+      "label": "Wagamama",
+      "type": "store"
+    },
+    "pret": {
+      "x": 750,
+      "y": 495,
+      "floor": 2,
+      "label": "Pret A Manger",
+      "type": "store"
+    },
+    "vue_cinema": {
+      "x": 170,
+      "y": 273,
+      "floor": 2,
+      "label": "Vue Cinema",
+      "type": "store"
+    }
+  },
+  "edges": {
+    "stairs_from_ground": {
+      "jct_east_bottom": 130
+    },
+    "jct_east_bottom": {
+      "stairs_from_ground": 130,
+      "jct_east_top": 350,
+      "jct_bottom": 300,
+      "leon": 130,
+      "pret": 74
+    },
+    "jct_east_top": {
+      "jct_east_bottom": 350,
+      "jct_top": 300,
+      "nandos": 148,
+      "wagamama": 88
+    },
+    "jct_top": {
+      "jct_east_top": 300,
+      "jct_center": 180,
+      "nandos": 158,
+      "vue_cinema": 241
+    },
+    "jct_bottom": {
+      "jct_east_bottom": 300,
+      "jct_center": 170,
+      "leon": 257
+    },
+    "jct_center": {
+      "jct_top": 180,
+      "jct_bottom": 170,
+      "vue_cinema": 254
+    },
+    "nandos": {
+      "jct_top": 158,
+      "jct_east_top": 148
+    },
+    "leon": {
+      "jct_bottom": 257,
+      "jct_east_bottom": 130
+    },
+    "wagamama": {
+      "jct_east_top": 88
+    },
+    "pret": {
+      "jct_east_bottom": 74
+    },
+    "vue_cinema": {
+      "jct_top": 241,
+      "jct_center": 254
+    }
+  }
+}
