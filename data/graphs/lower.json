@@ -1,0 +1,133 @@
+{
+  "nodes": {
+    "entrance_lg": {
+      "x": 450,
+      "y": 730,
+      "floor": 0,
+      "label": "Main Entrance",
+      "type": "entrance"
+    },
+    "jct_south": {
+      "x": 350,
+      "y": 660,
+      "floor": 0,
+      "label": "South Junction",
+      "type": "corridor"
+    },
+    "jct_center": {
+      "x": 350,
+      "y": 430,
+      "floor": 0,
+      "label": "Central Junction",
+      "type": "corridor"
+    },
+    "jct_north": {
+      "x": 350,
+      "y": 200,
+      "floor": 0,
+      "label": "North Junction",
+      "type": "corridor"
+    },
+    "corridor_east": {
+      "x": 700,
+      "y": 430,
+      "floor": 0,
+      "label": "East Corridor (Mid)",
+      "type": "corridor"
+    },
+    "corridor_east_top": {
+      "x": 700,
+      "y": 200,
+      "floor": 0,
+      "label": "East Corridor (Top)",
+      "type": "corridor"
+    },
+    "stairs_to_ground": {
+      "x": 770,
+      "y": 660,
+      "floor": 0,
+      "label": "Escalator \u2191 Ground",
+      "type": "stairs"
+    },
+    "john_lewis_lg": {
+      "x": 179,
+      "y": 367,
+      "floor": 0,
+      "label": "John Lewis (Lower Ground)",
+      "type": "store"
+    },
+    "hm": {
+      "x": 447,
+      "y": 466,
+      "floor": 0,
+      "label": "H&M",
+      "type": "store"
+    },
+    "food_court": {
+      "x": 795,
+      "y": 350,
+      "floor": 0,
+      "label": "Food Court",
+      "type": "store"
+    },
+    "sports_direct": {
+      "x": 615,
+      "y": 243,
+      "floor": 0,
+      "label": "Sports Direct",
+      "type": "store"
+    }
+  },
+  "edges": {
+    "entrance_lg": {
+      "jct_south": 122
+    },
+    "jct_south": {
+      "entrance_lg": 122,
+      "jct_center": 230,
+      "stairs_to_ground": 420
+    },
+    "jct_center": {
+      "jct_south": 230,
+      "jct_north": 230,
+      "corridor_east": 350,
+      "john_lewis_lg": 182,
+      "hm": 103
+    },
+    "jct_north": {
+      "jct_center": 230,
+      "corridor_east_top": 350,
+      "john_lewis_lg": 239
+    },
+    "corridor_east": {
+      "jct_center": 350,
+      "corridor_east_top": 230,
+      "stairs_to_ground": 240,
+      "food_court": 124
+    },
+    "corridor_east_top": {
+      "jct_north": 350,
+      "corridor_east": 230,
+      "sports_direct": 95,
+      "food_court": 178
+    },
+    "stairs_to_ground": {
+      "jct_south": 420,
+      "corridor_east": 240
+    },
+    "john_lewis_lg": {
+      "jct_center": 182,
+      "jct_north": 239
+    },
+    "hm": {
+      "jct_center": 103
+    },
+    "food_court": {
+      "corridor_east": 124,
+      "corridor_east_top": 178
+    },
+    "sports_direct": {
+      "corridor_east_top": 95
+    }
+  }
+}

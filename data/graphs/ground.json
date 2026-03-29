@@ -1,0 +1,144 @@
+{
+  "nodes": {
+    "entrance_gf": {
+      "x": 450,
+      "y": 730,
+      "floor": 1,
+      "label": "Main Entrance",
+      "type": "entrance"
+    },
+    "jct_south": {
+      "x": 350,
+      "y": 660,
+      "floor": 1,
+      "label": "South Junction",
+      "type": "corridor"
+    },
+    "jct_center": {
+      "x": 350,
+      "y": 450,
+      "floor": 1,
+      "label": "Central Junction",
+      "type": "corridor"
+    },
+    "jct_north": {
+      "x": 350,
+      "y": 200,
+      "floor": 1,
+      "label": "North Junction",
+      "type": "corridor"
+    },
+    "corridor_east": {
+      "x": 700,
+      "y": 450,
+      "floor": 1,
+      "label": "East Corridor",
+      "type": "corridor"
+    },
+    "stairs_to_lower": {
+      "x": 630,
+      "y": 660,
+      "floor": 1,
+      "label": "Escalator \u2193 Lower Ground",
+      "type": "stairs"
+    },
+    "stairs_to_upper": {
+      "x": 770,
+      "y": 660,
+      "floor": 1,
+      "label": "Escalator \u2191 Upper Floor",
+      "type": "stairs"
+    },
+    "john_lewis_gf": {
+      "x": 208,
+      "y": 470,
+      "floor": 1,
+      "label": "John Lewis (Ground Floor)",
+      "type": "store"
+    },
+    "apple_store": {
+      "x": 378,
+      "y": 354,
+      "floor": 1,
+      "label": "Apple Store",
+      "type": "store"
+    },
+    "info_desk": {
+      "x": 208,
+      "y": 203,
+      "floor": 1,
+      "label": "Information Desk",
+      "type": "service"
+    },
+    "zara": {
+      "x": 540,
+      "y": 248,
+      "floor": 1,
+      "label": "Zara",
+      "type": "store"
+    },
+    "marks_spencer": {
+      "x": 775,
+      "y": 368,
+      "floor": 1,
+      "label": "Marks & Spencer",
+      "type": "store"
+    }
+  },
+  "edges": {
+    "entrance_gf": {
+      "jct_south": 122
+    },
+    "jct_south": {
+      "entrance_gf": 122,
+      "jct_center": 210,
+      "stairs_to_lower": 280,
+      "stairs_to_upper": 420
+    },
+    "jct_center": {
+      "jct_south": 210,
+      "jct_north": 250,
+      "corridor_east": 350,
+      "john_lewis_gf": 143,
+      "apple_store": 100
+    },
+    "jct_north": {
+      "jct_center": 250,
+      "john_lewis_gf": 305,
+      "info_desk": 142,
+      "apple_store": 157,
+      "zara": 196
+    },
+    "corridor_east": {
+      "jct_center": 350,
+      "zara": 258,
+      "marks_spencer": 111
+    },
+    "stairs_to_lower": {
+      "jct_south": 280,
+      "stairs_to_upper": 140
+    },
+    "stairs_to_upper": {
+      "stairs_to_lower": 140,
+      "jct_south": 420
+    },
+    "john_lewis_gf": {
+      "jct_center": 143,
+      "jct_north": 305
+    },
+    "apple_store": {
+      "jct_center": 100,
+      "jct_north": 157
+    },
+    "info_desk": {
+      "jct_north": 142
+    },
+    "zara": {
+      "jct_north": 196,
+      "corridor_east": 258
+    },
+    "marks_spencer": {
+      "corridor_east": 111
+    }
+  }
+}

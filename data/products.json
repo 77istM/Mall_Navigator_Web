@@ -1,0 +1,66 @@
+{
+  "apple": {
+    "floor": 1,
+    "x": 378,
+    "y": 354,
+    "nearest_node": "apple_store",
+    "note": "Apple Store \u2013 Ground Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  },
+  "nandos": {
+    "floor": 2,
+    "x": 555,
+    "y": 229,
+    "nearest_node": "nandos",
+    "note": "Nando's Restaurant \u2013 Upper Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  },
+  "leon": {
+    "floor": 2,
+    "x": 632,
+    "y": 661,
+    "nearest_node": "leon",
+    "note": "Leon Restaurant \u2013 Upper Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  },
+  "hm": {
+    "floor": 0,
+    "x": 447,
+    "y": 466,
+    "nearest_node": "hm",
+    "note": "H&M \u2013 Lower Ground Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  },
+  "john lewis": {
+    "floor": 1,
+    "x": 208,
+    "y": 470,
+    "nearest_node": "john_lewis_gf",
+    "note": "John Lewis \u2013 Ground Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  },
+  "sports direct": {
+    "floor": 0,
+    "x": 615,
+    "y": 243,
+    "nearest_node": "sports_direct",
+    "note": "Sports Direct \u2013 Lower Ground Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  },
+  "zara": {
+    "floor": 1,
+    "x": 540,
+    "y": 248,
+    "nearest_node": "zara",
+    "note": "Zara \u2013 Ground Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  },
+  "food court": {
+    "floor": 0,
+    "x": 795,
+    "y": 350,
+    "nearest_node": "food_court",
+    "note": "Food Court \u2013 Lower Ground Floor",
+    "timestamp": "2024-01-01T00:00:00"
+  }
+}
