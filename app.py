@@ -38,8 +38,14 @@ from components.product_manager import (
     search_products, products_for_floor, is_product_open,
 )
 from components.directions_panel import render_comparison, render_directions
+from components.ml_recommendations import (
+    render_popular_routes_panel,
+    render_nearby_recommendations_panel,
+    init_ml_session_state,
+)
 from utils.coordinates import nearest_node, euclidean
 from utils.analytics import AnalyticsStore
+from utils.ml_features import get_ml_features
 from utils.feedback import save_feedback
 from utils.generate_maps import ensure_maps
 from utils.gps_verify import check_in_range
@@ -252,6 +258,8 @@ def _init_state():
         "admin_authenticated": False,
         "report_message": "",
         "report_contact": "",
+        "ml_search_history": [],
+        "show_ml_features": True,
         "rate_limiters": {
             "search": InMemoryRateLimiter(max_requests=20, window_seconds=60),
             "add_product": InMemoryRateLimiter(max_requests=10, window_seconds=60),
@@ -617,8 +625,16 @@ def _tab_navigate(graphs: dict[int, dict]):
             analytics.track_algorithm_result("astar", star)
             if star.get("found"):
                 analytics.track_route(star.get("path", []))
+                # Record for ML popular routes prediction
+                ml_factory = get_ml_features()
+                route_predictor = ml_factory.init_route_predictor()
+                route_predictor.record_route_taken(star.get("path", []))
             elif dijk.get("found"):
                 analytics.track_route(dijk.get("path", []))
+                # Record for ML popular routes prediction
+                ml_factory = get_ml_features()
+                route_predictor = ml_factory.init_route_predictor()
+                route_predictor.record_route_taken(dijk.get("path", []))
 
         st.rerun()
 
@@ -696,6 +712,52 @@ def _tab_navigate(graphs: dict[int, dict]):
                         f"{idx}. Distance: **{metres:.1f} m** ({route['cost']:.1f} px), "
                         f"steps: **{len(route['path']) - 1}**"
                     )
+
+        # ML Features Panel (Phase 5.3)
+        st.divider()
+        with st.expander("🤖 Smart Recommendations (ML)", expanded=False):
+            ml_factory = get_ml_features()
+            route_predictor = ml_factory.init_route_predictor()
+            recommender = ml_factory.init_nearby_recommender(
+                products=st.session_state.products
+            )
+
+            tab1, tab2, tab3 = st.tabs(
+                ["🔥 Popular Routes", "🎯 Nearby Stores", "📊 Hotspots"]
+            )
+
+            with tab1:
+                if route_predictor:
+                    render_popular_routes_panel(route_predictor)
+                else:
+                    st.info("Route predictor not initialized")
+
+            with tab2:
+                if recommender:
+                    current_node = st.session_state.end_node or st.session_state.start_node
+                    if current_node:
+                        render_nearby_recommendations_panel(
+                            recommender,
+                            current_node,
+                            nodes,
+                            max_distance=75.0,
+                        )
+                    else:
+                        st.info("Select a destination to see nearby stores")
+                else:
+                    st.info("Recommender not initialized")
+
+            with tab3:
+                if route_predictor:
+                    hotspots = route_predictor.get_node_popularity(limit=5)
+                    if hotspots:
+                        st.markdown("**Most visited areas (heatmap data):**")
+                        for i, (node_id, visits) in enumerate(hotspots, 1):
+                            st.write(f"{i}. Node `{node_id}` — {visits} visits")
+                    else:
+                        st.info("No traffic data available yet")
+                else:
+                    st.info("Route predictor not initialized")
 
         st.divider()
         with st.expander("📈 Phase 3 Analytics", expanded=False):
@@ -947,6 +1009,7 @@ def main():
 
     _init_state()
     init_live_navigation_state()
+    init_ml_session_state()
 
     graphs = _all_graphs()
 
