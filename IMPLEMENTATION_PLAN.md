@@ -216,13 +216,13 @@ The **Mall Navigator** is a well-structured A-Level project that successfully de
 **Priority**: MEDIUM | **Effort**: 1 week | **Impact**: Reliable updates
 
 **Tasks**:
-- [ ] **CI/CD pipeline** (GitHub Actions):
-  - [ ] Run tests on every PR
-  - [ ] Auto-deploy to Streamlit Cloud on merge to `main`
-- [ ] **Environment management**: `.env` file for store configs, API keys
-- [ ] **Blue-green deployment**: Streamlit Cloud integration + staging branch
-- [ ] **Rollback plan**: Document how to revert bad releases
-- [ ] **Database backups**: Daily SQLite backups to S3 (if moving to DB)
+- [x] **CI/CD pipeline** (GitHub Actions):
+  - [x] Run tests on every PR
+  - [x] Auto-deploy to Streamlit Cloud on merge to `main`
+- [x] **Environment management**: `.env` file for store configs, API keys
+- [x] **Blue-green deployment**: Streamlit Cloud integration + staging branch
+- [x] **Rollback plan**: Document how to revert bad releases
+- [x] **Database backups**: Daily SQLite backups to S3 (if moving to DB)
 
 ---
 
@@ -230,14 +230,14 @@ The **Mall Navigator** is a well-structured A-Level project that successfully de
 **Priority**: MEDIUM | **Effort**: 1 week | **Impact**: Easier maintenance
 
 **Tasks**:
-- [ ] **Admin dashboard** (Streamlit page):
-  - [ ] View/edit products, shops, opening hours
-  - [ ] Upload new floor plans + auto-generate graphs
-  - [ ] View analytics, error logs
-- [ ] **Graph editor UI**: Visual tool to add/remove waypoints and edges
-  - [ ] Drag-and-drop on floor plan → preview → save
-- [ ] **Documentation generator**: Auto-create README for new malls
-- [ ] **One-click deploy**: Script to onboard a new mall (copy template, update config)
+- [x] **Admin dashboard** (Streamlit page):
+  - [x] View/edit products, shops, opening hours
+  - [x] Upload new floor plans + auto-generate graphs
+  - [x] View analytics, error logs
+- [x] **Graph editor UI**: Visual tool to add/remove waypoints and edges
+  - [x] Click-to-place node editor with edge preview/save (MVP)
+- [x] **Documentation generator**: Auto-create README for new malls
+- [x] **One-click deploy**: Script to onboard a new mall (copy template, update config)
 
 ---
 

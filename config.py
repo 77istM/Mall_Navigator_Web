@@ -7,6 +7,11 @@ Centralized configuration for floors, colors, UI settings, and stores.
 import json
 import os
 
+from utils.env_config import load_env_file
+
+
+load_env_file()
+
 # ────────────────────────────────────────────────────────────────────────────
 # Streamlit Page Configuration
 # ────────────────────────────────────────────────────────────────────────────

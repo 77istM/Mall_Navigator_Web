@@ -55,6 +55,49 @@ No API keys, no billing, no server maintenance required.
 
 ---
 
+## ⚙️ Phase 5 Operations
+
+### CI/CD and Deployments
+
+GitHub Actions workflows are provided for:
+
+- PR and branch test runs: `.github/workflows/ci.yml`
+- Staging deployment (branch `staging`): `.github/workflows/deploy-staging.yml`
+- Production deployment (branch `main`): `.github/workflows/deploy-production.yml`
+- Daily SQLite backups to S3: `.github/workflows/backup-sqlite.yml`
+
+Configure these repository secrets before enabling deployments:
+
+- `STREAMLIT_DEPLOY_HOOK`
+- `STREAMLIT_STAGING_DEPLOY_HOOK`
+- `BACKUP_S3_BUCKET`
+- `AWS_REGION`
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+
+### Environment Management
+
+1. Copy `.env.example` to `.env`
+2. Fill in your local values (admin auth, Sentry, deploy hooks, backup settings)
+
+The app loads `.env` at startup through `utils/env_config.py`.
+
+### Operator Dashboard
+
+Run `streamlit run app.py`, then open the multipage admin screen:
+
+- `pages/4_Admin_Dashboard.py`
+
+This page includes product editing, floor-plan upload, graph editing,
+analytics/log review, and one-click store onboarding.
+
+### Rollback and Runbooks
+
+- `docs/OPERATIONS.md` for deployment and operations setup
+- `docs/ROLLBACK_PLAN.md` for production rollback steps
+
+---
+
 ## 🏗️ Project Structure
 
 ```
