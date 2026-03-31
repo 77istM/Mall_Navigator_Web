@@ -37,7 +37,7 @@ cd Alevel_cs_project2023
 pip install -r requirements.txt
 
 # 3. Run locally
-streamlit run app.py
+python3 -m streamlit run app.py
 ```
 
 Open `http://localhost:8501` in your browser.
