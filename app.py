@@ -15,6 +15,7 @@ import io
 import json
 import math
 import os
+import time
 from pathlib import Path
 
 import streamlit as st
@@ -39,19 +40,15 @@ from components.product_manager import (
 from components.directions_panel import render_comparison, render_directions
 from utils.coordinates import nearest_node, euclidean
 from utils.analytics import AnalyticsStore
+from utils.feedback import save_feedback
 from utils.generate_maps import ensure_maps
-from utils.gps_verify import check_in_range, STORES
+from utils.gps_verify import check_in_range
+from utils.health import run_health_checks
 from utils.location_tracking import LocationTracker
+from utils.monitoring import configure_logging, get_logger, log_event, setup_sentry
 from utils.routing import build_accessible_graph, walking_time_seconds
+from utils.security import InMemoryRateLimiter, sanitize_query, sanitize_text, verify_password
 from utils.ux_helpers import get_instruction_message
-
-# ── constants ─────────────────────────────────────────────────────────────────
-FLOORS = {
-    0: {"name": "Lower Ground", "map": "data/maps/lower.png",  "graph": "data/graphs/lower.json"},
-    1: {"name": "Ground Floor", "map": "data/maps/ground.png", "graph": "data/graphs/ground.json"},
-    2: {"name": "Upper Floor",  "map": "data/maps/upper.png",  "graph": "data/graphs/upper.json"},
-}
-FLOOR_NAMES = {k: v["name"] for k, v in FLOORS.items()}
 
 # ── configuration imports ─────────────────────────────────────────────────────
 from config import (
@@ -60,6 +57,10 @@ from config import (
     STORES, MODES, DEFAULT_FLOOR, DEFAULT_MODE, DEFAULT_PX_PER_METRE,
     PX_PER_METRE_MIN, PX_PER_METRE_MAX, PX_PER_METRE_STEP,
 )
+
+configure_logging()
+LOGGER = get_logger("mall_navigator")
+SENTRY_ENABLED = setup_sentry(os.getenv("SENTRY_DSN"))
 
 
 # ── page config ───────────────────────────────────────────────────────────────
@@ -159,6 +160,7 @@ def _run_pathfinding(
     Returns (dijkstra_result, astar_result) with prefixed node-id paths.
     """
     alternatives: list[dict[str, object]] = []
+    started = time.perf_counter()
 
     if start_floor == end_floor:
         g = graphs[start_floor]
@@ -185,6 +187,21 @@ def _run_pathfinding(
         star = astar(combined_edges, combined_coords, sk, ek)
         if star.get("found"):
             alternatives = yen_k_shortest_paths(combined_edges, sk, ek, k=k_routes)
+
+    elapsed_ms = (time.perf_counter() - started) * 1000.0
+    log_event(
+        LOGGER,
+        event="pathfinding_run",
+        start_floor=start_floor,
+        end_floor=end_floor,
+        accessible_mode=accessible_mode,
+        k_routes=k_routes,
+        graph_nodes=sum(len(g.get("nodes", {})) for g in graphs.values()),
+        graph_edges=sum(len(nbrs) for g in graphs.values() for nbrs in g.get("edges", {}).values()),
+        elapsed_ms=round(elapsed_ms, 2),
+        dijkstra_found=bool(dijk.get("found")),
+        astar_found=bool(star.get("found")),
+    )
 
     return dijk, star, alternatives
 
@@ -230,6 +247,16 @@ def _init_state():
         "add_y":         None,
         "add_name":      "",
         "alt_routes":    [],
+        "gps_disabled": False,
+        "privacy_policy_ack": False,
+        "admin_authenticated": False,
+        "report_message": "",
+        "report_contact": "",
+        "rate_limiters": {
+            "search": InMemoryRateLimiter(max_requests=20, window_seconds=60),
+            "add_product": InMemoryRateLimiter(max_requests=10, window_seconds=60),
+            "report_issue": InMemoryRateLimiter(max_requests=5, window_seconds=300),
+        },
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -243,6 +270,17 @@ def _gps_banner():
     Non-blocking GPS check.  Uses streamlit-js-eval to call the browser
     Geolocation API.  Shows a status banner but never blocks navigation.
     """
+    if st.session_state.gps_disabled:
+        st.info("📡 GPS is disabled for this session. You can re-enable it from Privacy settings.")
+        return
+
+    if not st.session_state.privacy_policy_ack:
+        st.info(
+            "🔐 GPS is disabled by default. Open Privacy settings in the sidebar and consent "
+            "if you want location-aware guidance."
+        )
+        return
+
     try:
         from streamlit_js_eval import get_geolocation
         if not st.session_state.gps_checked:
@@ -253,7 +291,7 @@ def _gps_banner():
                 st.session_state.gps_lng = loc["coords"]["longitude"]
                 st.session_state.gps_checked = True
     except Exception:
-        pass  # geolocation unavailable or denied – continue silently
+        LOGGER.exception("GPS geolocation call failed")
 
     if st.session_state.gps_lat is not None:
         result = check_in_range(
@@ -328,8 +366,16 @@ def _sidebar(graphs: dict[int, dict]):
             st.subheader("🔍 Find a product / store")
             query = st.text_input("Search", placeholder="e.g. apple, hm, leon")
             if query:
-                analytics.track_search(query)
-                hits = search_products(query, st.session_state.products)
+                clean_query = sanitize_query(query, max_len=80)
+                search_limit = st.session_state.rate_limiters["search"].allow("search")
+                if not search_limit.allowed:
+                    st.warning(
+                        f"Too many search requests. Try again in about {int(search_limit.retry_after_seconds) + 1}s."
+                    )
+                    hits = []
+                else:
+                    analytics.track_search(clean_query)
+                    hits = search_products(clean_query, st.session_state.products)
                 if hits:
                     for name, info in hits[:6]:
                         floor_lbl = FLOOR_NAMES[info["floor"]]
@@ -374,6 +420,41 @@ def _sidebar(graphs: dict[int, dict]):
                 max_value=5,
                 value=st.session_state.k_routes,
             )
+
+        with st.expander("🔐 Privacy"):
+            st.session_state.privacy_policy_ack = st.checkbox(
+                "I consent to GPS processing for navigation assistance",
+                value=bool(st.session_state.privacy_policy_ack),
+                help=(
+                    "Location data stays local to this app session unless you explicitly consent "
+                    "to live-navigation history storage."
+                ),
+            )
+            st.session_state.gps_disabled = st.checkbox(
+                "Disable GPS for this session",
+                value=bool(st.session_state.gps_disabled),
+            )
+            if st.session_state.gps_disabled:
+                st.session_state.gps_lat = None
+                st.session_state.gps_lng = None
+                st.session_state.gps_checked = False
+
+        with st.expander("🛠️ Admin Access"):
+            expected_hash = os.getenv("ADMIN_PASSWORD_HASH", "").strip().lower()
+            salt = os.getenv("ADMIN_PASSWORD_SALT", "").strip()
+            if not expected_hash or not salt:
+                st.caption("Admin authentication not configured. Set ADMIN_PASSWORD_HASH and ADMIN_PASSWORD_SALT.")
+                st.session_state.admin_authenticated = False
+            else:
+                admin_password = st.text_input("Admin password", type="password")
+                if st.button("Sign in", use_container_width=True):
+                    st.session_state.admin_authenticated = verify_password(admin_password, salt, expected_hash)
+                    if st.session_state.admin_authenticated:
+                        st.success("Admin authenticated.")
+                        log_event(LOGGER, event="admin_login_success")
+                    else:
+                        st.error("Invalid admin password.")
+                        log_event(LOGGER, event="admin_login_failure")
 
         # Start / end summary
         st.divider()
@@ -618,42 +699,100 @@ def _tab_navigate(graphs: dict[int, dict]):
 
         st.divider()
         with st.expander("📈 Phase 3 Analytics", expanded=False):
-            st.markdown("**Popular routes**")
-            top_routes = analytics.top_routes(limit=5)
-            if top_routes:
-                for key, count in top_routes:
-                    st.caption(f"• {key} — {count} runs")
+            if not st.session_state.admin_authenticated:
+                st.info("Admin sign-in required to view analytics.")
             else:
-                st.caption("No route history yet.")
+                st.markdown("**Popular routes**")
+                top_routes = analytics.top_routes(limit=5)
+                if top_routes:
+                    for key, count in top_routes:
+                        st.caption(f"• {key} — {count} runs")
+                else:
+                    st.caption("No route history yet.")
 
-            st.markdown("**Slow areas (high traffic waypoints)**")
-            slow_areas = analytics.slow_areas(limit=5)
-            if slow_areas:
-                for node_id, visits in slow_areas:
-                    st.caption(f"• {node_id} — {visits} visits")
-            else:
-                st.caption("No waypoint traffic yet.")
+                st.markdown("**Slow areas (high traffic waypoints)**")
+                slow_areas = analytics.slow_areas(limit=5)
+                if slow_areas:
+                    for node_id, visits in slow_areas:
+                        st.caption(f"• {node_id} — {visits} visits")
+                else:
+                    st.caption("No waypoint traffic yet.")
 
-            st.markdown("**Search trends**")
-            top_searches = analytics.top_search_terms(limit=5)
-            if top_searches:
-                for term, count in top_searches:
-                    st.caption(f"• {term} — {count} searches")
-            else:
-                st.caption("No search data yet.")
+                st.markdown("**Search trends**")
+                top_searches = analytics.top_search_terms(limit=5)
+                if top_searches:
+                    for term, count in top_searches:
+                        st.caption(f"• {term} — {count} searches")
+                else:
+                    st.caption("No search data yet.")
 
-            st.markdown("**Pathfinding comparison summary**")
-            summary = analytics.algorithm_summary()
-            if summary:
-                for algorithm, stats in summary.items():
+                st.markdown("**Pathfinding comparison summary**")
+                summary = analytics.algorithm_summary()
+                if summary:
+                    for algorithm, stats in summary.items():
+                        st.caption(
+                            f"• {algorithm}: runs={int(stats['runs'])}, "
+                            f"avg time={stats['avg_time_us']:.1f} us, "
+                            f"avg nodes={stats['avg_nodes_visited']:.1f}, "
+                            f"success={stats['success_rate'] * 100:.0f}%"
+                        )
+                else:
+                    st.caption("No algorithm run data yet.")
+
+        with st.expander("🩺 Health Checks", expanded=False):
+            if not st.session_state.admin_authenticated:
+                st.info("Admin sign-in required to run health checks.")
+            elif st.button("Run health checks", key="run_health_checks"):
+                graph_paths = [
+                    _resolve_floor_asset(st.session_state.store_key, idx, "graph")
+                    for idx in FLOORS
+                ]
+                health = run_health_checks(
+                    graph_paths=graph_paths,
+                    products_path="data/products.json",
+                )
+                if health["ok"]:
+                    st.success("All health checks passed.")
+                else:
+                    st.error("One or more health checks failed.")
+                for check in health["checks"]:
+                    icon = "✅" if check.get("ok") else "❌"
                     st.caption(
-                        f"• {algorithm}: runs={int(stats['runs'])}, "
-                        f"avg time={stats['avg_time_us']:.1f} us, "
-                        f"avg nodes={stats['avg_nodes_visited']:.1f}, "
-                        f"success={stats['success_rate'] * 100:.0f}%"
+                        f"{icon} {check.get('kind')} {check.get('path')} "
+                        f"(reason={check.get('reason')})"
                     )
-            else:
-                st.caption("No algorithm run data yet.")
+                log_event(LOGGER, event="health_check_run", success=health["ok"])
+
+        with st.expander("📝 Report Issue", expanded=False):
+            report_message = st.text_area(
+                "Describe the issue",
+                key="report_message",
+                max_chars=600,
+                placeholder="What happened? What did you expect?",
+            )
+            report_contact = st.text_input(
+                "Contact (optional)",
+                key="report_contact",
+                placeholder="email@example.com",
+            )
+            if st.button("Submit report", use_container_width=True, key="submit_report"):
+                report_limit = st.session_state.rate_limiters["report_issue"].allow("report")
+                if not report_limit.allowed:
+                    st.warning(
+                        f"Report limit reached. Try again in about {int(report_limit.retry_after_seconds) + 1}s."
+                    )
+                else:
+                    entry = save_feedback(
+                        message=report_message,
+                        contact=report_contact,
+                        context={
+                            "store": st.session_state.store_key,
+                            "floor": floor,
+                            "tab": st.session_state.tab,
+                        },
+                    )
+                    st.success("Thanks, your report has been saved.")
+                    log_event(LOGGER, event="issue_reported", has_contact=bool(entry.get("contact")))
 
 
 # ── add product tab ──────────────────────────────────────────────────────────
@@ -696,22 +835,34 @@ def _tab_add_product(graphs: dict[int, dict]):
 
         if st.button("💾 Save product", type="primary",
                      disabled=not (name.strip() and st.session_state.add_x)):
-            g = graphs[add_floor]
-            updated, nn = add_product(
-                name,
-                add_floor,
-                st.session_state.add_x,
-                st.session_state.add_y,
-                g["nodes"],
-                opening_hours=opening_hours,
-                category=category,
-            )
-            st.session_state.products = updated
-            st.session_state.add_x = None
-            st.session_state.add_y = None
-            st.session_state.add_name = ""
-            st.success(f"✅ Saved **{name.lower().strip()}**!")
-            st.rerun()
+            add_limit = st.session_state.rate_limiters["add_product"].allow("add_product")
+            if not add_limit.allowed:
+                st.warning(
+                    f"Add-product rate limit reached. Try again in about {int(add_limit.retry_after_seconds) + 1}s."
+                )
+            else:
+                g = graphs[add_floor]
+                try:
+                    updated, _ = add_product(
+                        sanitize_text(name, max_len=80),
+                        add_floor,
+                        st.session_state.add_x,
+                        st.session_state.add_y,
+                        g["nodes"],
+                        opening_hours=sanitize_text(opening_hours, max_len=32),
+                        category=sanitize_text(category, max_len=32),
+                    )
+                except ValueError as exc:
+                    st.error(str(exc))
+                    log_event(LOGGER, event="add_product_validation_error", reason=str(exc))
+                else:
+                    st.session_state.products = updated
+                    st.session_state.add_x = None
+                    st.session_state.add_y = None
+                    st.session_state.add_name = ""
+                    st.success(f"✅ Saved **{sanitize_text(name, max_len=80).lower().strip()}**!")
+                    log_event(LOGGER, event="product_saved", floor=add_floor)
+                    st.rerun()
 
         st.divider()
         st.subheader("🗑️ Remove a product")
@@ -790,6 +941,10 @@ def main():
     base = os.path.dirname(__file__)
     ensure_maps(os.path.join(base, "data", "maps"))
 
+    if "app_started_logged" not in st.session_state:
+        log_event(LOGGER, event="app_session_started", sentry_enabled=SENTRY_ENABLED)
+        st.session_state.app_started_logged = True
+
     _init_state()
     init_live_navigation_state()
 
@@ -818,4 +973,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        LOGGER.exception("Unhandled application error")
+        raise
