@@ -1,0 +1,23 @@
+{
+  "asda_old_kent_road": {
+    "name": "Asda Superstore - Old Kent Road",
+    "lat": 51.4884,
+    "lng": -0.0669,
+    "graph_dir": "data/graphs",
+    "map_dir": "data/maps"
+  },
+  "sainsburys_whitechapel": {
+    "name": "Sainsbury's - Whitechapel",
+    "lat": 51.5153,
+    "lng": -0.0668,
+    "graph_dir": "data/graphs",
+    "map_dir": "data/maps"
+  },
+  "demo": {
+    "name": "Demo Mall (any location)",
+    "lat": 0.0,
+    "lng": 0.0,
+    "graph_dir": "data/graphs",
+    "map_dir": "data/maps"
+  }
+}
