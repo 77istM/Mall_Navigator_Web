@@ -7,6 +7,8 @@ built on **Streamlit** and deployable for free on
 > **A-Level Computer Science Project** — Istiak Mohammad  
 > Evolved from the original tkinter/guizero pathfinding project (`final_project.pdf`).
 
+📄 **[Full Academic Documentation (documentation.docx)](documentation.docx)** — comprehensive research report covering analysis, design, development, testing, evaluation, and future work.
+
 ---
 
 ## ✨ Features
@@ -287,6 +289,15 @@ to give the AR arrow a reliable "true north" reference.
 ### Multi-user Product Crowd-sourcing *(planned)*
 - Replace local `products.json` with a cloud database (e.g. Supabase free tier).
 - Any user can pin a product; all users see each other's pins.
+
+---
+
+## 📄 Documentation
+
+| Document | Description |
+|---|---|
+| [`documentation.docx`](documentation.docx) | **Full academic research documentation** — analysis, design, algorithms, testing, evaluation, and future work |
+| [`final_project.pdf`](final_project.pdf) | Original A-Level Computer Science project submission (tkinter/guizero prototype) |
 
 ---
 
