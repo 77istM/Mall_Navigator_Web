@@ -4,6 +4,9 @@ Configuration constants for Mall Navigator.
 Centralized configuration for floors, colors, UI settings, and stores.
 """
 
+import json
+import os
+
 # ────────────────────────────────────────────────────────────────────────────
 # Streamlit Page Configuration
 # ────────────────────────────────────────────────────────────────────────────
@@ -110,23 +113,47 @@ WAYPOINT_TYPES = ("corridor", "stairs", "entrance", "service")
 # Store Configuration
 # ────────────────────────────────────────────────────────────────────────────
 
-STORES = {
+_STORES_FALLBACK = {
     "asda_old_kent_road": {
-        "name": "Asda Superstore – Old Kent Road",
+        "name": "Asda Superstore - Old Kent Road",
         "lat": 51.4884,
         "lng": -0.0669,
+        "graph_dir": "data/graphs",
+        "map_dir": "data/maps",
     },
     "sainsburys_whitechapel": {
-        "name": "Sainsbury's – Whitechapel",
+        "name": "Sainsbury's - Whitechapel",
         "lat": 51.5153,
         "lng": -0.0668,
+        "graph_dir": "data/graphs",
+        "map_dir": "data/maps",
     },
     "demo": {
         "name": "Demo Mall (any location)",
         "lat": 0.0,
         "lng": 0.0,
+        "graph_dir": "data/graphs",
+        "map_dir": "data/maps",
     },
 }
+
+
+def _load_stores() -> dict:
+    base_dir = os.path.dirname(__file__)
+    stores_path = os.path.join(base_dir, "data", "stores.json")
+    if not os.path.exists(stores_path):
+        return _STORES_FALLBACK
+    try:
+        with open(stores_path, encoding="utf-8") as f:
+            loaded = json.load(f)
+        if isinstance(loaded, dict) and loaded:
+            return loaded
+    except (json.JSONDecodeError, OSError):
+        pass
+    return _STORES_FALLBACK
+
+
+STORES = _load_stores()
 
 # GPS verification threshold (metres)
 STORE_RADIUS_M = 500
@@ -153,6 +180,7 @@ MODES = {
 # ────────────────────────────────────────────────────────────────────────────
 
 PRODUCTS_FILE = "data/products.json"
+PRODUCTS_DB_FILE = "data/products.db"
 PRODUCT_SEARCH_RESULTS_LIMIT = 6
 
 

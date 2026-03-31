@@ -1,44 +1,39 @@
-"""Product cache manager.
+"""Product cache manager with pluggable JSON/SQLite storage."""
 
-Products are stored in data/products.json as:
-{
-  "<name_lowercase>": {
-    "floor": int,
-    "x": float,
-    "y": float,
-    "nearest_node": str,
-    "note": str,
-    "timestamp": ISO-8601 str
-  }
-}
-"""
-import json
-import os
 from datetime import datetime
-from typing import Dict, Tuple
+import os
 
+from config import PRODUCTS_DB_FILE, PRODUCTS_FILE
 from utils.coordinates import nearest_node as _nearest_node
+from utils.db import JsonProductStore, SQLiteProductStore
 
-_PRODUCTS_FILE = os.path.join(
-    os.path.dirname(__file__), "..", "data", "products.json"
-)
+
+def _build_store():
+    backend = os.getenv("PRODUCT_STORE_BACKEND", "json").lower().strip()
+    if backend == "sqlite":
+        db_path = os.path.normpath(
+            os.path.join(os.path.dirname(__file__), "..", PRODUCTS_DB_FILE)
+        )
+        return SQLiteProductStore(db_path)
+
+    json_path = os.path.normpath(
+        os.path.join(os.path.dirname(__file__), "..", PRODUCTS_FILE)
+    )
+    return JsonProductStore(json_path)
+
+
+_PRODUCT_STORE = _build_store()
 
 
 def load_products() -> Dict[str, Dict]:
     """Load and return the full product cache dict."""
-    path = os.path.normpath(_PRODUCTS_FILE)
-    if os.path.exists(path):
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    return {}
+    return _PRODUCT_STORE.load_all()
 
 
-def save_products(products: Dict[str, Dict]) -> None:
-    """Persist the product cache to disk."""
-    path = os.path.normpath(_PRODUCTS_FILE)
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(products, f, indent=2)
+def save_products(products: dict) -> None:
+    """Persist all product entries to the configured store backend."""
+    for name, product in products.items():
+        _PRODUCT_STORE.upsert(name, product)
 
 
 def add_product(
@@ -48,24 +43,25 @@ def add_product(
     y: float,
     nodes_for_floor: Dict,
     note: str = "",
-) -> Tuple[Dict[str, Dict], str]:
-    """
-    Add or overwrite a product entry.
-
-    Returns (updated_products_dict, nearest_node_id).
-    """
+    opening_hours: str = "",
+    category: str = "",
+) -> tuple[dict, str]:
+    """Add or overwrite a product entry and return (products, nearest_node)."""
     products = load_products()
     key = name.lower().strip()
     nn = _nearest_node(x, y, nodes_for_floor)
-    products[key] = {
+    payload = {
         "floor": floor,
         "x": x,
         "y": y,
         "nearest_node": nn,
         "note": note,
+        "opening_hours": opening_hours,
+        "category": category,
         "timestamp": datetime.now().isoformat(timespec="seconds"),
     }
-    save_products(products)
+    products[key] = payload
+    _PRODUCT_STORE.upsert(key, payload)
     return products, nn
 
 
@@ -74,17 +70,12 @@ def delete_product(name: str) -> Dict[str, Dict]:
     products = load_products()
     key = name.lower().strip()
     products.pop(key, None)
-    save_products(products)
+    _PRODUCT_STORE.delete(key)
     return products
 
 
-def search_products(query: str, products: Dict[str, Dict] | None = None) -> list[Tuple[str, Dict]]:
-    """
-    Case-insensitive partial-match search.
-
-    Returns list of (name, info) pairs sorted by exact-match first,
-    then alphabetical.
-    """
+def search_products(query: str, products: dict | None = None) -> list[tuple[str, dict]]:
+    """Case-insensitive partial-match search with exact-match priority."""
     if products is None:
         products = load_products()
     q = query.lower().strip()
@@ -100,3 +91,25 @@ def products_for_floor(floor: int, products: Dict[str, Dict] | None = None) -> D
     if products is None:
         products = load_products()
     return {k: v for k, v in products.items() if v.get("floor") == floor}
+
+
+def is_product_open(product: dict, now: datetime | None = None) -> bool | None:
+    """Return open status for simple HH:MM-HH:MM schedule, None if unknown."""
+    opening_hours = str(product.get("opening_hours", "")).strip()
+    if not opening_hours or "-" not in opening_hours:
+        return None
+
+    now = now or datetime.now()
+    try:
+        start_s, end_s = [part.strip() for part in opening_hours.split("-", 1)]
+        start_h, start_m = [int(part) for part in start_s.split(":", 1)]
+        end_h, end_m = [int(part) for part in end_s.split(":", 1)]
+    except (TypeError, ValueError):
+        return None
+
+    cur_min = now.hour * 60 + now.minute
+    start_min = start_h * 60 + start_m
+    end_min = end_h * 60 + end_m
+    if end_min < start_min:
+        return cur_min >= start_min or cur_min <= end_min
+    return start_min <= cur_min <= end_min

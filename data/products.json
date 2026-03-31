@@ -5,6 +5,8 @@
     "y": 354,
     "nearest_node": "apple_store",
     "note": "Apple Store \u2013 Ground Floor",
+    "opening_hours": "10:00-21:00",
+    "category": "Retail",
     "timestamp": "2024-01-01T00:00:00"
   },
   "nandos": {
@@ -13,6 +15,8 @@
     "y": 229,
     "nearest_node": "nandos",
     "note": "Nando's Restaurant \u2013 Upper Floor",
+    "opening_hours": "11:00-22:00",
+    "category": "Food",
     "timestamp": "2024-01-01T00:00:00"
   },
   "leon": {
@@ -21,6 +25,8 @@
     "y": 661,
     "nearest_node": "leon",
     "note": "Leon Restaurant \u2013 Upper Floor",
+    "opening_hours": "08:00-21:00",
+    "category": "Food",
     "timestamp": "2024-01-01T00:00:00"
   },
   "hm": {
@@ -29,6 +35,8 @@
     "y": 466,
     "nearest_node": "hm",
     "note": "H&M \u2013 Lower Ground Floor",
+    "opening_hours": "09:00-20:00",
+    "category": "Retail",
     "timestamp": "2024-01-01T00:00:00"
   },
   "john lewis": {
@@ -37,6 +45,8 @@
     "y": 470,
     "nearest_node": "john_lewis_gf",
     "note": "John Lewis \u2013 Ground Floor",
+    "opening_hours": "09:30-20:00",
+    "category": "Retail",
     "timestamp": "2024-01-01T00:00:00"
   },
   "sports direct": {
@@ -45,6 +55,8 @@
     "y": 243,
     "nearest_node": "sports_direct",
     "note": "Sports Direct \u2013 Lower Ground Floor",
+    "opening_hours": "09:00-21:00",
+    "category": "Retail",
     "timestamp": "2024-01-01T00:00:00"
   },
   "zara": {
@@ -53,6 +65,8 @@
     "y": 248,
     "nearest_node": "zara",
     "note": "Zara \u2013 Ground Floor",
+    "opening_hours": "10:00-21:00",
+    "category": "Retail",
     "timestamp": "2024-01-01T00:00:00"
   },
   "food court": {
@@ -61,6 +75,8 @@
     "y": 350,
     "nearest_node": "food_court",
     "note": "Food Court \u2013 Lower Ground Floor",
+    "opening_hours": "10:00-22:00",
+    "category": "Food",
     "timestamp": "2024-01-01T00:00:00"
   }
 }

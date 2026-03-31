@@ -15,6 +15,7 @@ import io
 import json
 import math
 import os
+from pathlib import Path
 
 import streamlit as st
 from streamlit_image_coordinates import streamlit_image_coordinates
@@ -23,20 +24,26 @@ from PIL import Image
 # ── local imports ─────────────────────────────────────────────────────────────
 from algorithms.dijkstra import dijkstra
 from algorithms.astar import astar
+from algorithms.yen_ksp import yen_k_shortest_paths
 from components.map_view import render_floor_map, generate_directions, path_pixel_list
 from components.outdoor_map import render_outdoor_map
 from components.product_manager import (
     load_products, add_product, delete_product,
-    search_products, products_for_floor,
+    search_products, products_for_floor, is_product_open,
 )
 from components.directions_panel import render_comparison, render_directions
 from utils.coordinates import nearest_node, euclidean
 from utils.generate_maps import ensure_maps
-from utils.gps_verify import check_in_range
-from utils.ux_helpers import (
-    format_distance_summary, get_error_message, format_node_info,
-    format_path_info, get_instruction_message,
-)
+from utils.gps_verify import check_in_range, STORES
+from utils.routing import build_accessible_graph, walking_time_seconds
+
+# ── constants ─────────────────────────────────────────────────────────────────
+FLOORS = {
+    0: {"name": "Lower Ground", "map": "data/maps/lower.png",  "graph": "data/graphs/lower.json"},
+    1: {"name": "Ground Floor", "map": "data/maps/ground.png", "graph": "data/graphs/ground.json"},
+    2: {"name": "Upper Floor",  "map": "data/maps/upper.png",  "graph": "data/graphs/upper.json"},
+}
+FLOOR_NAMES = {k: v["name"] for k, v in FLOORS.items()}
 
 # ── configuration imports ─────────────────────────────────────────────────────
 from config import (
@@ -70,7 +77,26 @@ def _load_image(path: str) -> Image.Image:
 
 
 def _all_graphs() -> dict[int, dict]:
-    return {i: _load_graph(FLOORS[i]["graph"]) for i in FLOORS}
+    return {
+        i: _load_graph(_resolve_floor_asset(st.session_state.store_key, i, "graph"))
+        for i in FLOORS
+    }
+
+
+def _resolve_floor_asset(store_key: str, floor_idx: int, asset: str) -> str:
+    """Resolve store-specific graph/map path with fallback to default config."""
+    if asset not in {"graph", "map"}:
+        raise ValueError(f"Unsupported asset type: {asset}")
+
+    default_path = FLOORS[floor_idx][asset]
+    store_cfg = STORES.get(store_key, {})
+    root_key = "graph_dir" if asset == "graph" else "map_dir"
+    root_dir = str(store_cfg.get(root_key, "")).strip()
+    if not root_dir:
+        return default_path
+
+    candidate = str(Path(root_dir) / Path(default_path).name)
+    return candidate if os.path.exists(candidate) else default_path
 
 
 def _build_combined_graph(graphs: dict[int, dict]) -> tuple[dict, dict]:
@@ -116,25 +142,43 @@ def _run_pathfinding(
     end_floor: int,
     end_node: str,
     graphs: dict[int, dict],
-) -> tuple[dict, dict]:
+    *,
+    accessible_mode: bool,
+    k_routes: int,
+) -> tuple[dict, dict, list[dict[str, object]]]:
     """
     Run both Dijkstra and A* between start and end (possibly on different floors).
     Returns (dijkstra_result, astar_result) with prefixed node-id paths.
     """
+    alternatives: list[dict[str, object]] = []
+
     if start_floor == end_floor:
         g = graphs[start_floor]
         node_coords = g["nodes"]
-        edge_dict = g["edges"]
+        edge_dict = build_accessible_graph(
+            g["edges"],
+            g["nodes"],
+            prefer_accessible=accessible_mode,
+        )
         dijk = dijkstra(edge_dict, start_node, end_node)
         star = astar(edge_dict, node_coords, start_node, end_node)
+        if star.get("found"):
+            alternatives = yen_k_shortest_paths(edge_dict, start_node, end_node, k=k_routes)
     else:
         combined_edges, combined_coords = _build_combined_graph(graphs)
+        combined_edges = build_accessible_graph(
+            combined_edges,
+            combined_coords,
+            prefer_accessible=accessible_mode,
+        )
         sk = f"{start_floor}:{start_node}"
         ek = f"{end_floor}:{end_node}"
         dijk = dijkstra(combined_edges, sk, ek)
         star = astar(combined_edges, combined_coords, sk, ek)
+        if star.get("found"):
+            alternatives = yen_k_shortest_paths(combined_edges, sk, ek, k=k_routes)
 
-    return dijk, star
+    return dijk, star, alternatives
 
 
 def _path_for_floor(path: list[str], floor: int, multi_floor: bool) -> list[str]:
@@ -166,6 +210,8 @@ def _init_state():
         "products":      load_products(),
         "px_per_metre":  DEFAULT_PX_PER_METRE,
         "show_wpts":     False,
+        "accessible_mode": False,
+        "k_routes":      3,
         "gps_lat":       None,
         "gps_lng":       None,
         "gps_checked":   False,
@@ -175,6 +221,7 @@ def _init_state():
         "add_x":         None,
         "add_y":         None,
         "add_name":      "",
+        "alt_routes":    [],
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -275,8 +322,14 @@ def _sidebar(graphs: dict[int, dict]):
                 if hits:
                     for name, info in hits[:6]:
                         floor_lbl = FLOOR_NAMES[info["floor"]]
+                        open_state = is_product_open(info)
+                        status = ""
+                        if open_state is True:
+                            status = " | Open"
+                        elif open_state is False:
+                            status = " | Closed"
                         if st.button(
-                            f"📍 {name.title()} — {floor_lbl}",
+                            f"📍 {name.title()} — {floor_lbl}{status}",
                             key=f"srch_{name}",
                             use_container_width=True,
                         ):
@@ -300,6 +353,16 @@ def _sidebar(graphs: dict[int, dict]):
             st.session_state.show_wpts = st.checkbox(
                 "Show waypoints", value=st.session_state.show_wpts
             )
+            st.session_state.accessible_mode = st.checkbox(
+                "Accessibility mode (avoid stairs/escalators)",
+                value=st.session_state.accessible_mode,
+            )
+            st.session_state.k_routes = st.slider(
+                "Alternative routes",
+                min_value=1,
+                max_value=5,
+                value=st.session_state.k_routes,
+            )
 
         # Start / end summary
         st.divider()
@@ -317,35 +380,27 @@ def _sidebar(graphs: dict[int, dict]):
         st.markdown(f"🔴 **End:** {e_lbl}")
 
         if st.session_state.start_node and st.session_state.end_node:
-            if st.button("🔍 Find Path", type="primary", use_container_width=True,
-                        help="Calculate shortest paths using both algorithms"):
-                dijk, star = _run_pathfinding(
+            if st.button("🔍 Find Path", type="primary", use_container_width=True):
+                dijk, star, alternatives = _run_pathfinding(
                     st.session_state.start_floor,
                     st.session_state.start_node,
                     st.session_state.end_floor,
                     st.session_state.end_node,
                     graphs,
+                    accessible_mode=st.session_state.accessible_mode,
+                    k_routes=st.session_state.k_routes,
                 )
                 st.session_state.dijk_result = dijk
                 st.session_state.star_result = star
+                st.session_state.alt_routes = alternatives
                 st.rerun()
 
-        col_reset, col_clear = st.columns(2)
-        with col_reset:
-            if st.button("🔄 Reset", use_container_width=True,
-                        help="Clear all selections and start over"):
-                for k in ("start_node", "end_node", "start_floor", "end_floor",
-                          "dijk_result", "star_result"):
-                    st.session_state[k] = None
-                st.session_state.selecting = "start"
-                st.rerun()
-        
-        with col_clear:
-            if st.button("🗑️ Clear Path", use_container_width=True,
-                        help="Clear path results only"):
-                st.session_state.dijk_result = None
-                st.session_state.star_result = None
-                st.rerun()
+        if st.button("🔄 Reset", use_container_width=True):
+            for k in ("start_node", "end_node", "start_floor", "end_floor",
+                      "dijk_result", "star_result", "alt_routes"):
+                st.session_state[k] = None
+            st.session_state.selecting = "start"
+            st.rerun()
 
 
 # ── navigate tab ─────────────────────────────────────────────────────────────
@@ -384,7 +439,7 @@ def _tab_navigate(graphs: dict[int, dict]):
 
     # Render overlay image
     img = render_floor_map(
-        FLOORS[floor]["map"],
+        _resolve_floor_asset(st.session_state.store_key, floor, "map"),
         nodes,
         start_node=s_node,
         end_node=e_node,
@@ -427,15 +482,18 @@ def _tab_navigate(graphs: dict[int, dict]):
 
         # Auto-run pathfinding when both ends are set
         if st.session_state.start_node and st.session_state.end_node:
-            dijk, star = _run_pathfinding(
+            dijk, star, alternatives = _run_pathfinding(
                 st.session_state.start_floor,
                 st.session_state.start_node,
                 st.session_state.end_floor,
                 st.session_state.end_node,
                 graphs,
+                accessible_mode=st.session_state.accessible_mode,
+                k_routes=st.session_state.k_routes,
             )
             st.session_state.dijk_result = dijk
             st.session_state.star_result = star
+            st.session_state.alt_routes = alternatives
 
         st.rerun()
 
@@ -449,47 +507,35 @@ def _tab_navigate(graphs: dict[int, dict]):
     # ── results panel ─────────────────────────────────────────────────────────
     if st.session_state.dijk_result and st.session_state.star_result:
         st.divider()
-        
-        # Check if paths were found
-        paths_found = (
-            st.session_state.dijk_result.get("found", False) and
-            st.session_state.star_result.get("found", False)
-        )
-        
-        if not paths_found:
-            # Show helpful error message
-            error_msg = get_error_message(st.session_state.dijk_result)
-            if error_msg:
-                st.error(error_msg)
-        else:
-            # Show success summary with distance
-            with st.container():
-                col1, col2 = st.columns([2, 1])
-                with col1:
-                    summary = format_distance_summary(
-                        st.session_state.dijk_result,
-                        st.session_state.star_result,
-                        st.session_state.px_per_metre,
-                    )
-                    st.markdown(summary)
-                with col2:
-                    st.metric(
-                        "Est. walking time",
-                        f"{int(st.session_state.dijk_result['cost'] / st.session_state.px_per_metre / 1.4)} sec",  # ~1.4 m/s walking speed
-                        help="Approximate at typical walking speed"
-                    )
-            
-            st.divider()
-            
-            # Directions (use A* path, same optimal cost as Dijkstra)
-            best = (st.session_state.star_result
-                    if st.session_state.star_result["found"]
-                    else st.session_state.dijk_result)
-            if best["found"]:
-                # For multi-floor, show directions for the current floor segment only
-                path_here = _path_for_floor(best["path"], floor, multi)
-                steps = generate_directions(
-                    path_here, nodes, st.session_state.px_per_metre
+        if st.session_state.star_result["found"]:
+            if multi:
+                _, combined_nodes = _build_combined_graph(graphs)
+                walk_seconds = walking_time_seconds(
+                    st.session_state.star_result["path"],
+                    combined_nodes,
+                    st.session_state.px_per_metre,
+                )
+            else:
+                walk_seconds = walking_time_seconds(
+                    st.session_state.star_result["path"],
+                    nodes,
+                    st.session_state.px_per_metre,
+                )
+            st.metric("Estimated walking time", f"{walk_seconds} sec")
+
+        # Directions (use A* path, same optimal cost as Dijkstra)
+        best = (st.session_state.star_result
+                if st.session_state.star_result["found"]
+                else st.session_state.dijk_result)
+        if best["found"]:
+            # For multi-floor, show directions for the current floor segment only
+            path_here = _path_for_floor(best["path"], floor, multi)
+            steps = generate_directions(
+                path_here, nodes, st.session_state.px_per_metre
+            )
+            if steps:
+                render_directions(
+                    steps, path_here, nodes, st.session_state.px_per_metre
                 )
                 if steps:
                     with st.expander("📋 Step-by-step directions", expanded=True):
@@ -511,6 +557,23 @@ def _tab_navigate(graphs: dict[int, dict]):
                     st.session_state.px_per_metre,
                 )
 
+        st.divider()
+        render_comparison(
+            st.session_state.dijk_result,
+            st.session_state.star_result,
+            st.session_state.px_per_metre,
+        )
+
+        if st.session_state.alt_routes:
+            st.divider()
+            with st.expander("🛣️ Alternative routes", expanded=False):
+                for idx, route in enumerate(st.session_state.alt_routes, start=1):
+                    metres = float(route["cost"]) / st.session_state.px_per_metre
+                    st.markdown(
+                        f"{idx}. Distance: **{metres:.1f} m** ({route['cost']:.1f} px), "
+                        f"steps: **{len(route['path']) - 1}**"
+                    )
+
 
 # ── add product tab ──────────────────────────────────────────────────────────
 
@@ -526,6 +589,15 @@ def _tab_add_product(graphs: dict[int, dict]):
     with col_form:
         name = st.text_input("Product / store name", value=st.session_state.add_name,
                              placeholder="e.g. milk, trainers, pharmacy")
+        opening_hours = st.text_input(
+            "Opening hours",
+            placeholder="e.g. 09:00-21:00",
+            help="Simple daily format supported in this phase: HH:MM-HH:MM",
+        )
+        category = st.selectbox(
+            "Category",
+            options=["", "Food", "Retail", "Services"],
+        )
         floor_lbl = st.selectbox("Floor", list(FLOOR_NAMES.values()),
                                  index=st.session_state.add_floor)
         add_floor = [k for k, v in FLOOR_NAMES.items() if v == floor_lbl][0]
@@ -550,6 +622,8 @@ def _tab_add_product(graphs: dict[int, dict]):
                 st.session_state.add_x,
                 st.session_state.add_y,
                 g["nodes"],
+                opening_hours=opening_hours,
+                category=category,
             )
             st.session_state.products = updated
             st.session_state.add_x = None
@@ -571,7 +645,7 @@ def _tab_add_product(graphs: dict[int, dict]):
     with col_map:
         g = graphs[add_floor]
         img = render_floor_map(
-            FLOORS[add_floor]["map"],
+            _resolve_floor_asset(st.session_state.store_key, add_floor, "map"),
             g["nodes"],
             show_waypoints=True,
             products=products_for_floor(add_floor, st.session_state.products),
