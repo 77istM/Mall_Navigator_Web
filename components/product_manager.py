@@ -2,10 +2,12 @@
 
 from datetime import datetime
 import os
+from typing import Dict
 
 from config import PRODUCTS_DB_FILE, PRODUCTS_FILE
 from utils.coordinates import nearest_node as _nearest_node
 from utils.db import JsonProductStore, SQLiteProductStore
+from utils.security import is_valid_product_name, sanitize_query, sanitize_text
 
 
 def _build_store():
@@ -48,16 +50,20 @@ def add_product(
 ) -> tuple[dict, str]:
     """Add or overwrite a product entry and return (products, nearest_node)."""
     products = load_products()
-    key = name.lower().strip()
+    clean_name = sanitize_text(name, max_len=80)
+    if not is_valid_product_name(clean_name):
+        raise ValueError("Product name must be 2-80 valid characters")
+
+    key = clean_name.lower().strip()
     nn = _nearest_node(x, y, nodes_for_floor)
     payload = {
         "floor": floor,
         "x": x,
         "y": y,
         "nearest_node": nn,
-        "note": note,
-        "opening_hours": opening_hours,
-        "category": category,
+        "note": sanitize_text(note, max_len=200),
+        "opening_hours": sanitize_text(opening_hours, max_len=32),
+        "category": sanitize_text(category, max_len=32),
         "timestamp": datetime.now().isoformat(timespec="seconds"),
     }
     products[key] = payload
@@ -68,7 +74,7 @@ def add_product(
 def delete_product(name: str) -> Dict[str, Dict]:
     """Remove a product from the cache. Returns updated dict."""
     products = load_products()
-    key = name.lower().strip()
+    key = sanitize_text(name, max_len=80).lower().strip()
     products.pop(key, None)
     _PRODUCT_STORE.delete(key)
     return products
@@ -78,7 +84,7 @@ def search_products(query: str, products: dict | None = None) -> list[tuple[str,
     """Case-insensitive partial-match search with exact-match priority."""
     if products is None:
         products = load_products()
-    q = query.lower().strip()
+    q = sanitize_query(query, max_len=80)
     if not q:
         return list(products.items())
     exact = [(k, v) for k, v in products.items() if k == q]

@@ -175,9 +175,9 @@ The **Mall Navigator** is a well-structured A-Level project that successfully de
 
 **Tasks**:
 - [ ] **Unit tests** (started in Phase 1): Target 75%+ coverage
-- [ ] **Integration tests**: Test full flow (select start → end → render path → show directions)
-- [ ] **E2E tests** (Playwright): Automate user journeys in Streamlit
-- [ ] **Load testing**: How many concurrent users on Streamlit Cloud?
+- [x] **Integration tests**: Test full flow (select start → end → render path → show directions)
+- [x] **E2E tests** (Playwright): Automate user journeys in Streamlit (scaffold + smoke tests)
+- [x] **Load testing**: How many concurrent users on Streamlit Cloud? (k6 smoke script)
 - [ ] **Accessibility audit**: WCAG 2.1 AA compliance (screen reader support, keyboard nav)
   - [ ] Test with NVDA, JAWS
 - [ ] **Browser compatibility**: Test Safari, Firefox, Chrome, Edge
@@ -188,13 +188,13 @@ The **Mall Navigator** is a well-structured A-Level project that successfully de
 **Priority**: HIGH | **Effort**: 1 week | **Impact**: Trust, GDPR compliance
 
 **Tasks**:
-- [ ] **Sanitize user input**: Product names, search queries (prevent injection)
+- [x] **Sanitize user input**: Product names, search queries (prevent injection)
 - [ ] **HTTPS enforcement**: Streamlit Cloud provides this by default ✓
-- [ ] **GPS data**: Privacy policy + consent modal (GDPR/CCPA)
-  - [ ] Option to disable GPS permanently
-  - [ ] Don't store GPS history by default
-- [ ] **API rate limiting**: If exposing backend APIs (Phase 3.2)
-- [ ] **Admin authentication**: Hashed passwords for bulk import / analytics dashboard
+- [x] **GPS data**: Privacy policy + consent modal (GDPR/CCPA)
+  - [x] Option to disable GPS permanently (session-level)
+  - [x] Don't store GPS history by default
+- [x] **API rate limiting**: Session rate limits for search/add/report actions
+- [x] **Admin authentication**: Hashed passwords for analytics dashboard
 
 ---
 
@@ -202,11 +202,11 @@ The **Mall Navigator** is a well-structured A-Level project that successfully de
 **Priority**: MEDIUM | **Effort**: 3 days | **Impact**: Proactive issue detection
 
 **Tasks**:
-- [ ] **Error tracking**: Sentry.io (free tier) for crash reports
-- [ ] **Structured logging**: Replace print() → logger (Python logging module)
-- [ ] **Performance metrics**: Log pathfinding times, graph sizes → identify bottlenecks
-- [ ] **User feedback widget**: In-app "Report Issue" button
-- [ ] **Health checks**: Endpoint to verify all graphs/products load correctly
+- [x] **Error tracking**: Sentry.io (free tier) hook for crash reports
+- [x] **Structured logging**: Replace print() → logger (Python logging module)
+- [x] **Performance metrics**: Log pathfinding times, graph sizes → identify bottlenecks
+- [x] **User feedback widget**: In-app "Report Issue" button
+- [x] **Health checks**: Health check runner to verify graphs/products load correctly
 
 ---
 

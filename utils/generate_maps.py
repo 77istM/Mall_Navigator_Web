@@ -15,6 +15,7 @@ Run this module directly to (re-)generate the images:
 """
 
 import math
+import logging
 import os
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
@@ -227,4 +228,5 @@ def ensure_maps(maps_dir: str = "data/maps") -> None:
 
 if __name__ == "__main__":
     ensure_maps()
-    print("Floor plan images written to data/maps/")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    logging.getLogger(__name__).info("Floor plan images written to data/maps/")
