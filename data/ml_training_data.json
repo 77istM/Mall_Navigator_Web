@@ -1,0 +1,50 @@
+{
+  "routes_by_time": {
+    "20-24_Tuesday": {
+      "stairs_to_lower->stairs_to_upper": 1,
+      "stairs_to_upper->marks_spencer": 2,
+      "marks_spencer->corridor_east": 1,
+      "stairs_to_upper->corridor_east": 1,
+      "entrance_gf->stairs_to_upper": 3,
+      "marks_spencer->apple_store": 1,
+      "0:jct_center->1:marks_spencer": 1,
+      "food_court->jct_center": 1,
+      "jct_south->food_court": 1,
+      "jct_south->stairs_to_ground": 1,
+      "stairs_to_upper->jct_center": 1,
+      "stairs_to_upper->entrance_gf": 2,
+      "jct_south->entrance_gf": 2,
+      "jct_south->marks_spencer": 1,
+      "marks_spencer->stairs_to_upper": 1,
+      "stairs_to_upper->apple_store": 1,
+      "apple_store->stairs_to_upper": 1,
+      "stairs_to_upper->info_desk": 1,
+      "info_desk->marks_spencer": 1,
+      "stairs_to_upper->jct_south": 2,
+      "jct_south->stairs_to_lower": 1
+    }
+  },
+  "node_popularity": {
+    "stairs_to_lower": 2,
+    "stairs_to_upper": 16,
+    "jct_south": 21,
+    "jct_center": 12,
+    "corridor_east": 10,
+    "marks_spencer": 7,
+    "entrance_gf": 7,
+    "apple_store": 3,
+    "0:jct_center": 1,
+    "0:corridor_east": 1,
+    "0:stairs_to_ground": 1,
+    "1:stairs_to_lower": 1,
+    "1:jct_south": 1,
+    "1:jct_center": 1,
+    "1:corridor_east": 1,
+    "1:marks_spencer": 1,
+    "food_court": 2,
+    "stairs_to_ground": 1,
+    "jct_north": 2,
+    "info_desk": 2,
+    "zara": 1
+  }
+}
