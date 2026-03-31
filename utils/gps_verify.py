@@ -12,32 +12,7 @@ prototype deployed in public.
 
 import math
 from utils.coordinates import haversine_m
-
-# ---------------------------------------------------------------------------
-# Store registry (add more stores here as needed)
-# ---------------------------------------------------------------------------
-
-STORES: dict[str, dict] = {
-    "asda_old_kent_road": {
-        "name": "Asda Superstore – Old Kent Road",
-        "lat": 51.4884,
-        "lng": -0.0669,
-    },
-    "sainsburys_whitechapel": {
-        "name": "Sainsbury's – Whitechapel",
-        "lat": 51.5153,
-        "lng": -0.0668,
-    },
-    "demo": {
-        "name": "Demo Mall (any location)",
-        "lat": 0.0,
-        "lng": 0.0,
-    },
-}
-
-# Radius within which a user is considered "at" the store.
-# 500 m covers the car park and surrounding area.
-STORE_RADIUS_M = 500
+from config import STORES, STORE_RADIUS_M
 
 
 def check_in_range(

@@ -32,30 +32,23 @@ from components.product_manager import (
 from components.directions_panel import render_comparison, render_directions
 from utils.coordinates import nearest_node, euclidean
 from utils.generate_maps import ensure_maps
-from utils.gps_verify import check_in_range, STORES
+from utils.gps_verify import check_in_range
 
-# ── constants ─────────────────────────────────────────────────────────────────
-FLOORS = {
-    0: {"name": "Lower Ground", "map": "data/maps/lower.png",  "graph": "data/graphs/lower.json"},
-    1: {"name": "Ground Floor", "map": "data/maps/ground.png", "graph": "data/graphs/ground.json"},
-    2: {"name": "Upper Floor",  "map": "data/maps/upper.png",  "graph": "data/graphs/upper.json"},
-}
-FLOOR_NAMES = {k: v["name"] for k, v in FLOORS.items()}
-
-# Inter-floor transition edges (stairs/escalators).
-# Key: (floor_a, node_a, floor_b, node_b), value: cost in pixels.
-INTER_FLOOR_EDGES = [
-    (0, "stairs_to_ground",   1, "stairs_to_lower",   200),
-    (1, "stairs_to_upper",    2, "stairs_from_ground", 200),
-]
+# ── configuration imports ─────────────────────────────────────────────────────
+from config import (
+    PAGE_TITLE, PAGE_ICON, PAGE_LAYOUT, INITIAL_SIDEBAR_STATE,
+    FLOORS, FLOOR_NAMES, INTER_FLOOR_EDGES,
+    STORES, MODES, DEFAULT_FLOOR, DEFAULT_MODE, DEFAULT_PX_PER_METRE,
+    PX_PER_METRE_MIN, PX_PER_METRE_MAX, PX_PER_METRE_STEP,
+)
 
 
 # ── page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Mall Navigator",
-    page_icon="🗺️",
-    layout="wide",
-    initial_sidebar_state="expanded",
+    page_title=PAGE_TITLE,
+    page_icon=PAGE_ICON,
+    layout=PAGE_LAYOUT,
+    initial_sidebar_state=INITIAL_SIDEBAR_STATE,
 )
 
 
@@ -151,7 +144,7 @@ def _pil_to_bytes(img: Image.Image) -> bytes:
 
 def _init_state():
     defaults = {
-        "current_floor": 1,          # start on ground floor
+        "current_floor": DEFAULT_FLOOR,
         "start_floor":   None,
         "start_node":    None,
         "end_floor":     None,
@@ -160,14 +153,14 @@ def _init_state():
         "dijk_result":   None,
         "star_result":   None,
         "products":      load_products(),
-        "px_per_metre":  10.0,
+        "px_per_metre":  DEFAULT_PX_PER_METRE,
         "show_wpts":     False,
         "gps_lat":       None,
         "gps_lng":       None,
         "gps_checked":   False,
         "store_key":     "asda_old_kent_road",
-        "tab":           "navigate",  # "navigate" | "add_product" | "outdoor"
-        "add_floor":     1,
+        "tab":           DEFAULT_MODE,
+        "add_floor":     DEFAULT_FLOOR,
         "add_x":         None,
         "add_y":         None,
         "add_name":      "",
@@ -242,9 +235,7 @@ def _sidebar(graphs: dict[int, dict]):
         st.divider()
 
         # Mode tabs
-        tab_labels = {"navigate": "🧭 Navigate", "add_product": "📌 Add Product",
-                      "outdoor": "🌍 Outdoor Map"}
-        for key, label in tab_labels.items():
+        for key, label in MODES.items():
             if st.button(label, use_container_width=True,
                          type="primary" if st.session_state.tab == key else "secondary"):
                 st.session_state.tab = key
@@ -291,8 +282,8 @@ def _sidebar(graphs: dict[int, dict]):
         with st.expander("⚙️ Settings"):
             st.session_state.px_per_metre = st.slider(
                 "Scale (px per metre)",
-                min_value=5.0, max_value=30.0,
-                value=st.session_state.px_per_metre, step=0.5,
+                min_value=PX_PER_METRE_MIN, max_value=PX_PER_METRE_MAX,
+                value=st.session_state.px_per_metre, step=PX_PER_METRE_STEP,
                 help="Calibrate to your floor plan. Default 10 px/m is approximate.",
             )
             st.session_state.show_wpts = st.checkbox(
