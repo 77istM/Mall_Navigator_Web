@@ -226,6 +226,13 @@ def _pil_to_bytes(img: Image.Image) -> bytes:
     return buf.getvalue()
 
 
+def _clear_route_state() -> None:
+    """Clear computed route results when start/end points change."""
+    st.session_state.dijk_result = None
+    st.session_state.star_result = None
+    st.session_state.alt_routes = []
+
+
 # ── session-state initialisation ─────────────────────────────────────────────
 
 def _init_state():
@@ -402,6 +409,7 @@ def _sidebar(graphs: dict[int, dict]):
                             st.session_state.end_node = info["nearest_node"]
                             st.session_state.current_floor = info["floor"]
                             st.session_state.selecting = "start"
+                            _clear_route_state()
                             st.rerun()
                 else:
                     st.caption("No results.")
@@ -497,14 +505,20 @@ def _sidebar(graphs: dict[int, dict]):
                 analytics.track_algorithm_result("astar", star)
                 if star.get("found"):
                     analytics.track_route(star.get("path", []))
+                    ml_factory = get_ml_features()
+                    route_predictor = ml_factory.init_route_predictor()
+                    route_predictor.record_route_taken(star.get("path", []))
                 elif dijk.get("found"):
                     analytics.track_route(dijk.get("path", []))
+                    ml_factory = get_ml_features()
+                    route_predictor = ml_factory.init_route_predictor()
+                    route_predictor.record_route_taken(dijk.get("path", []))
                 st.rerun()
 
         if st.button("🔄 Reset", use_container_width=True):
-            for k in ("start_node", "end_node", "start_floor", "end_floor",
-                      "dijk_result", "star_result", "alt_routes"):
+            for k in ("start_node", "end_node", "start_floor", "end_floor"):
                 st.session_state[k] = None
+            _clear_route_state()
             st.session_state.selecting = "start"
             st.rerun()
 
@@ -516,7 +530,6 @@ def _tab_navigate(graphs: dict[int, dict]):
     g = graphs[floor]
     nodes = g["nodes"]
     tracker = LocationTracker()
-    analytics = AnalyticsStore()
 
     # Determine which paths to draw (same-floor segments only)
     multi = (
@@ -607,34 +620,7 @@ def _tab_navigate(graphs: dict[int, dict]):
             st.session_state.end_floor = floor
             st.session_state.selecting = "start"
 
-        # Auto-run pathfinding when both ends are set
-        if st.session_state.start_node and st.session_state.end_node:
-            dijk, star, alternatives = _run_pathfinding(
-                st.session_state.start_floor,
-                st.session_state.start_node,
-                st.session_state.end_floor,
-                st.session_state.end_node,
-                graphs,
-                accessible_mode=st.session_state.accessible_mode,
-                k_routes=st.session_state.k_routes,
-            )
-            st.session_state.dijk_result = dijk
-            st.session_state.star_result = star
-            st.session_state.alt_routes = alternatives
-            analytics.track_algorithm_result("dijkstra", dijk)
-            analytics.track_algorithm_result("astar", star)
-            if star.get("found"):
-                analytics.track_route(star.get("path", []))
-                # Record for ML popular routes prediction
-                ml_factory = get_ml_features()
-                route_predictor = ml_factory.init_route_predictor()
-                route_predictor.record_route_taken(star.get("path", []))
-            elif dijk.get("found"):
-                analytics.track_route(dijk.get("path", []))
-                # Record for ML popular routes prediction
-                ml_factory = get_ml_features()
-                route_predictor = ml_factory.init_route_predictor()
-                route_predictor.record_route_taken(dijk.get("path", []))
+        _clear_route_state()
 
         st.rerun()
 
@@ -728,7 +714,7 @@ def _tab_navigate(graphs: dict[int, dict]):
 
             with tab1:
                 if route_predictor:
-                    render_popular_routes_panel(route_predictor)
+                    render_popular_routes_panel(route_predictor, floor)
                 else:
                     st.info("Route predictor not initialized")
 
