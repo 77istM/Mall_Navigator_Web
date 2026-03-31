@@ -12,7 +12,7 @@ from config import (
     FONT_NAMES, LABEL_SIZE_DEFAULT, LABEL_SIZE_MARKER, LABEL_SIZE_START_END,
     LABEL_SIZE_WAYPOINT, LABEL_OFFSET_NODE_ABOVE, LABEL_OFFSET_PRODUCT_BELOW,
     LABEL_OFFSET_MARKER_ABOVE, WAYPOINT_TYPES, OUTLINE_WIDTH_DEFAULT,
-    OUTLINE_WIDTH_THICK, MARKER_START_END_RADIUS, MARKER_WAYPOINT_RADIUS,
+    OUTLINE_WIDTH_THICK, OUTLINE_WIDTH_THIN, MARKER_START_END_RADIUS, MARKER_WAYPOINT_RADIUS,
     MARKER_PRODUCT_RADIUS, MARKER_PATH_ENDPOINT_RADIUS, PATH_LINE_WIDTH_BACKGROUND,
     PATH_LINE_WIDTH_FOREGROUND, COLOR_START, COLOR_END, COLOR_PATH_DIJKSTRA,
     COLOR_PATH_ASTAR, COLOR_WAYPOINT, COLOR_PRODUCT, COLOR_TEXT, COLOR_OUTLINE,
@@ -83,56 +83,81 @@ def render_floor_map(
     show_waypoints  : draw small dots at every waypoint
     """
     img = Image.open(image_path).convert("RGB")
+    
+    # ── resize image to fit screen ────────────────────────────────────────────
+    # Max dimensions to ensure image fits on one screen (leaving room for UI)
+    max_width, max_height = 1200, 900
+    orig_width, orig_height = img.size
+    
+    # Calculate scale factor to fit within max dimensions
+    scale_w = max_width / orig_width if orig_width > max_width else 1.0
+    scale_h = max_height / orig_height if orig_height > max_height else 1.0
+    scale = min(scale_w, scale_h, 1.0)  # Don't upscale if image is already small
+    
+    if scale < 1.0:
+        new_width = int(orig_width * scale)
+        new_height = int(orig_height * scale)
+        img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    else:
+        scale = 1.0
+    
     draw = ImageDraw.Draw(img, "RGBA")
+    
+    # Helper function to scale coordinates
+    def scale_coord(val):
+        return val * scale
 
     def node_px(nid):
-        return (int(nodes[nid]["x"]), int(nodes[nid]["y"]))
+        return (int(scale_coord(nodes[nid]["x"])), int(scale_coord(nodes[nid]["y"])))
 
     # ── optional: show all waypoints ────────────────────────────────────────
     if show_waypoints:
         for nid, nd in nodes.items():
             if nd["type"] in WAYPOINT_TYPES:
-                _circle(draw, nd["x"], nd["y"], MARKER_WAYPOINT_RADIUS, COLOR_WAYPOINT + (ALPHA_WAYPOINT_BG,),
+                scaled_x = scale_coord(nd["x"])
+                scaled_y = scale_coord(nd["y"])
+                _circle(draw, scaled_x, scaled_y, MARKER_WAYPOINT_RADIUS * scale, COLOR_WAYPOINT + (ALPHA_WAYPOINT_BG,),
                         outline=COLOR_OUTLINE + (ALPHA_WAYPOINT_OUTLINE,), w=OUTLINE_WIDTH_THIN)
-                _label(draw, nd["x"], nd["y"] - LABEL_OFFSET_NODE_ABOVE, nid.split("_")[0][:6],
-                       size=LABEL_SIZE_WAYPOINT, colour=COLOR_WAYPOINT)
+                _label(draw, scaled_x, scaled_y - LABEL_OFFSET_NODE_ABOVE * scale, nid.split("_")[0][:6],
+                       size=max(int(LABEL_SIZE_WAYPOINT * scale), 8), colour=COLOR_WAYPOINT)
 
     # ── product markers ──────────────────────────────────────────────────────
     if products:
         for name, info in products.items():
-            px, py = int(info["x"]), int(info["y"])
-            _circle(draw, px, py, MARKER_PRODUCT_RADIUS, COLOR_PRODUCT + (ALPHA_PRODUCT_BG,),
+            px = int(scale_coord(info["x"]))
+            py = int(scale_coord(info["y"]))
+            _circle(draw, px, py, MARKER_PRODUCT_RADIUS * scale, COLOR_PRODUCT + (ALPHA_PRODUCT_BG,),
                     outline=COLOR_OUTLINE + (ALPHA_PRODUCT_OUTLINE,), w=OUTLINE_WIDTH_DEFAULT)
-            _label(draw, px, py + LABEL_OFFSET_PRODUCT_BELOW, name[:12], size=LABEL_SIZE_MARKER, colour=COLOR_PRODUCT)
+            _label(draw, px, py + LABEL_OFFSET_PRODUCT_BELOW * scale, name[:12], size=max(int(LABEL_SIZE_MARKER * scale), 8), colour=COLOR_PRODUCT)
 
     # ── paths ────────────────────────────────────────────────────────────────
     if dijkstra_path:
         px_list = [node_px(n) for n in dijkstra_path if n in nodes]
         if len(px_list) >= 2:
             # semi-transparent background line
-            draw.line(px_list, fill=COLOR_PATH_DIJKSTRA + (PATH_BACKGROUND_ALPHA,), width=PATH_LINE_WIDTH_BACKGROUND, joint="curve")
-            draw.line(px_list, fill=COLOR_PATH_DIJKSTRA + (PATH_FOREGROUND_ALPHA,), width=PATH_LINE_WIDTH_FOREGROUND, joint="curve")
+            draw.line(px_list, fill=COLOR_PATH_DIJKSTRA + (PATH_BACKGROUND_ALPHA,), width=max(int(PATH_LINE_WIDTH_BACKGROUND * scale), 1), joint="curve")
+            draw.line(px_list, fill=COLOR_PATH_DIJKSTRA + (PATH_FOREGROUND_ALPHA,), width=max(int(PATH_LINE_WIDTH_FOREGROUND * scale), 1), joint="curve")
 
     if astar_path:
         px_list = [node_px(n) for n in astar_path if n in nodes]
         if len(px_list) >= 2:
-            draw.line(px_list, fill=COLOR_PATH_ASTAR + (PATH_BACKGROUND_ALPHA,), width=PATH_LINE_WIDTH_BACKGROUND, joint="curve")
-            draw.line(px_list, fill=COLOR_PATH_ASTAR + (PATH_FOREGROUND_ALPHA,), width=PATH_LINE_WIDTH_FOREGROUND, joint="curve")
+            draw.line(px_list, fill=COLOR_PATH_ASTAR + (PATH_BACKGROUND_ALPHA,), width=max(int(PATH_LINE_WIDTH_BACKGROUND * scale), 1), joint="curve")
+            draw.line(px_list, fill=COLOR_PATH_ASTAR + (PATH_FOREGROUND_ALPHA,), width=max(int(PATH_LINE_WIDTH_FOREGROUND * scale), 1), joint="curve")
 
     # ── start / end markers ──────────────────────────────────────────────────
     if start_node and start_node in nodes:
         sx, sy = node_px(start_node)
-        _circle(draw, sx, sy, MARKER_START_END_RADIUS, COLOR_START + (ALPHA_START_END,), w=OUTLINE_WIDTH_THICK)
-        _label(draw, sx, sy, "S", size=LABEL_SIZE_START_END + 4, colour=COLOR_OUTLINE)
-        _label(draw, sx, sy - LABEL_OFFSET_MARKER_ABOVE, nodes[start_node]["label"][:18],
-               size=LABEL_SIZE_START_END, colour=COLOR_START)
+        _circle(draw, sx, sy, MARKER_START_END_RADIUS * scale, COLOR_START + (ALPHA_START_END,), w=max(int(OUTLINE_WIDTH_THICK * scale), 1))
+        _label(draw, sx, sy, "S", size=max(int((LABEL_SIZE_START_END + 4) * scale), 8), colour=COLOR_OUTLINE)
+        _label(draw, sx, sy - LABEL_OFFSET_MARKER_ABOVE * scale, nodes[start_node]["label"][:18],
+               size=max(int(LABEL_SIZE_START_END * scale), 8), colour=COLOR_START)
 
     if end_node and end_node in nodes:
         ex, ey = node_px(end_node)
-        _circle(draw, ex, ey, MARKER_START_END_RADIUS, COLOR_END + (ALPHA_START_END,), w=OUTLINE_WIDTH_THICK)
-        _label(draw, ex, ey, "E", size=LABEL_SIZE_START_END + 4, colour=COLOR_OUTLINE)
-        _label(draw, ex, ey - LABEL_OFFSET_MARKER_ABOVE, nodes[end_node]["label"][:18],
-               size=LABEL_SIZE_START_END, colour=COLOR_END)
+        _circle(draw, ex, ey, MARKER_START_END_RADIUS * scale, COLOR_END + (ALPHA_START_END,), w=max(int(OUTLINE_WIDTH_THICK * scale), 1))
+        _label(draw, ex, ey, "E", size=max(int((LABEL_SIZE_START_END + 4) * scale), 8), colour=COLOR_OUTLINE)
+        _label(draw, ex, ey - LABEL_OFFSET_MARKER_ABOVE * scale, nodes[end_node]["label"][:18],
+               size=max(int(LABEL_SIZE_START_END * scale), 8), colour=COLOR_END)
 
     return img
 

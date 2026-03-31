@@ -1,0 +1,1639 @@
+{
+  "search_terms": {
+    "next": 60
+  },
+  "route_counts": {
+    "stairs_to_lower->stairs_to_upper": 1,
+    "stairs_to_upper->marks_spencer": 1,
+    "marks_spencer->corridor_east": 1,
+    "stairs_to_upper->corridor_east": 1,
+    "entrance_gf->stairs_to_upper": 1,
+    "marks_spencer->apple_store": 1,
+    "0:jct_center->1:marks_spencer": 1,
+    "food_court->jct_center": 1,
+    "jct_south->food_court": 1,
+    "jct_south->stairs_to_ground": 1
+  },
+  "node_visit_counts": {
+    "stairs_to_lower": 1,
+    "stairs_to_upper": 4,
+    "jct_south": 5,
+    "jct_center": 5,
+    "corridor_east": 6,
+    "marks_spencer": 3,
+    "entrance_gf": 1,
+    "apple_store": 1,
+    "0:jct_center": 1,
+    "0:corridor_east": 1,
+    "0:stairs_to_ground": 1,
+    "1:stairs_to_lower": 1,
+    "1:jct_south": 1,
+    "1:jct_center": 1,
+    "1:corridor_east": 1,
+    "1:marks_spencer": 1,
+    "food_court": 2,
+    "stairs_to_ground": 1
+  },
+  "algorithm_runs": [
+    {
+      "timestamp": "2026-03-31T23:36:36.258724+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.3,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.262741+00:00",
+      "algorithm": "astar",
+      "time_us": 25.26,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.390038+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 9.64,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.394018+00:00",
+      "algorithm": "astar",
+      "time_us": 5.39,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.521337+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.56,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.525460+00:00",
+      "algorithm": "astar",
+      "time_us": 3.22,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.643684+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.11,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.647160+00:00",
+      "algorithm": "astar",
+      "time_us": 3.51,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.774834+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.4,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.778248+00:00",
+      "algorithm": "astar",
+      "time_us": 4.91,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.902265+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.84,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:36.909398+00:00",
+      "algorithm": "astar",
+      "time_us": 5.2,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.034040+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 12.99,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.036745+00:00",
+      "algorithm": "astar",
+      "time_us": 3.48,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.144659+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 4.86,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.147713+00:00",
+      "algorithm": "astar",
+      "time_us": 3.43,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.256230+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.23,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.259228+00:00",
+      "algorithm": "astar",
+      "time_us": 3.65,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.388984+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 10.52,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.395078+00:00",
+      "algorithm": "astar",
+      "time_us": 5.38,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.552281+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.66,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.554456+00:00",
+      "algorithm": "astar",
+      "time_us": 4.91,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.663152+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.85,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.665890+00:00",
+      "algorithm": "astar",
+      "time_us": 4.35,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.785054+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.43,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.787981+00:00",
+      "algorithm": "astar",
+      "time_us": 5.09,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.917645+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.36,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:37.920465+00:00",
+      "algorithm": "astar",
+      "time_us": 3.74,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.030038+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.02,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.033163+00:00",
+      "algorithm": "astar",
+      "time_us": 3.23,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.157140+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.1,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.159978+00:00",
+      "algorithm": "astar",
+      "time_us": 3.13,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.268595+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.75,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.271368+00:00",
+      "algorithm": "astar",
+      "time_us": 3.11,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.391435+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.06,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.394148+00:00",
+      "algorithm": "astar",
+      "time_us": 5.22,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.510245+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 9.28,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.513849+00:00",
+      "algorithm": "astar",
+      "time_us": 5.05,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.676247+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 24.68,
+      "nodes_visited": 6,
+      "cost": 474.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.679618+00:00",
+      "algorithm": "astar",
+      "time_us": 16.82,
+      "nodes_visited": 3,
+      "cost": 474.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.811972+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 9.15,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.816072+00:00",
+      "algorithm": "astar",
+      "time_us": 5.1,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.946074+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.43,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:38.949090+00:00",
+      "algorithm": "astar",
+      "time_us": 5.06,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.063593+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.58,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.067628+00:00",
+      "algorithm": "astar",
+      "time_us": 3.12,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.180285+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.78,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.184116+00:00",
+      "algorithm": "astar",
+      "time_us": 3.41,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.298379+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.18,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.300861+00:00",
+      "algorithm": "astar",
+      "time_us": 3.32,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.436531+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.12,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.438917+00:00",
+      "algorithm": "astar",
+      "time_us": 4.9,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.570970+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.6,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.574568+00:00",
+      "algorithm": "astar",
+      "time_us": 5.02,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.685366+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.08,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.688860+00:00",
+      "algorithm": "astar",
+      "time_us": 3.41,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.806876+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.17,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.810771+00:00",
+      "algorithm": "astar",
+      "time_us": 3.88,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.928845+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.64,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:39.931574+00:00",
+      "algorithm": "astar",
+      "time_us": 4.76,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.049122+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.15,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.052101+00:00",
+      "algorithm": "astar",
+      "time_us": 3.25,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.184065+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.13,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.187526+00:00",
+      "algorithm": "astar",
+      "time_us": 3.47,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.311282+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.54,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.314151+00:00",
+      "algorithm": "astar",
+      "time_us": 5.48,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.430433+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.83,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.435686+00:00",
+      "algorithm": "astar",
+      "time_us": 3.46,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.557914+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.24,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.560303+00:00",
+      "algorithm": "astar",
+      "time_us": 3.48,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.693923+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.48,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.696620+00:00",
+      "algorithm": "astar",
+      "time_us": 5.76,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.824703+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.07,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.828270+00:00",
+      "algorithm": "astar",
+      "time_us": 3.94,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.951431+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.64,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:40.954120+00:00",
+      "algorithm": "astar",
+      "time_us": 3.46,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.073585+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.54,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.076608+00:00",
+      "algorithm": "astar",
+      "time_us": 3.29,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.196496+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.11,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.199078+00:00",
+      "algorithm": "astar",
+      "time_us": 3.29,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.345446+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.48,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.348744+00:00",
+      "algorithm": "astar",
+      "time_us": 3.25,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.464311+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.83,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.467183+00:00",
+      "algorithm": "astar",
+      "time_us": 3.59,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.579347+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.76,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.582689+00:00",
+      "algorithm": "astar",
+      "time_us": 4.3,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.732175+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.46,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.735461+00:00",
+      "algorithm": "astar",
+      "time_us": 3.48,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.859758+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.37,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:41.863298+00:00",
+      "algorithm": "astar",
+      "time_us": 3.48,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.013706+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.65,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.016898+00:00",
+      "algorithm": "astar",
+      "time_us": 3.64,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.153612+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.36,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.156453+00:00",
+      "algorithm": "astar",
+      "time_us": 4.84,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.295972+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.17,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.299273+00:00",
+      "algorithm": "astar",
+      "time_us": 5.25,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.451335+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.15,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.454500+00:00",
+      "algorithm": "astar",
+      "time_us": 4.33,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.599891+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.03,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.603351+00:00",
+      "algorithm": "astar",
+      "time_us": 5.39,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.745434+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.25,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.748451+00:00",
+      "algorithm": "astar",
+      "time_us": 3.62,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.874320+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.91,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:42.876986+00:00",
+      "algorithm": "astar",
+      "time_us": 4.77,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.013916+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.24,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.016955+00:00",
+      "algorithm": "astar",
+      "time_us": 5.62,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.142872+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.89,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.146815+00:00",
+      "algorithm": "astar",
+      "time_us": 3.63,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.288951+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.42,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.291761+00:00",
+      "algorithm": "astar",
+      "time_us": 4.15,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.435596+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.98,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.438573+00:00",
+      "algorithm": "astar",
+      "time_us": 3.71,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.565247+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.52,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.568603+00:00",
+      "algorithm": "astar",
+      "time_us": 3.31,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.703619+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.86,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:43.707835+00:00",
+      "algorithm": "astar",
+      "time_us": 4.14,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.108050+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 21.66,
+      "nodes_visited": 9,
+      "cost": 704.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.110849+00:00",
+      "algorithm": "astar",
+      "time_us": 17.13,
+      "nodes_visited": 6,
+      "cost": 704.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.249246+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.37,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.252627+00:00",
+      "algorithm": "astar",
+      "time_us": 3.72,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.390154+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.76,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.393719+00:00",
+      "algorithm": "astar",
+      "time_us": 3.81,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.515941+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.7,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.518882+00:00",
+      "algorithm": "astar",
+      "time_us": 4.51,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.655622+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 9.32,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.658744+00:00",
+      "algorithm": "astar",
+      "time_us": 4.86,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.807153+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.95,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.810415+00:00",
+      "algorithm": "astar",
+      "time_us": 4.93,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.928699+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.21,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:55.931555+00:00",
+      "algorithm": "astar",
+      "time_us": 3.41,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.042862+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.25,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.047264+00:00",
+      "algorithm": "astar",
+      "time_us": 4.04,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.198836+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.22,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.202295+00:00",
+      "algorithm": "astar",
+      "time_us": 4.78,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.311398+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.04,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.314251+00:00",
+      "algorithm": "astar",
+      "time_us": 3.16,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.426405+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.25,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.429188+00:00",
+      "algorithm": "astar",
+      "time_us": 3.74,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.552842+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 4.8,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.556120+00:00",
+      "algorithm": "astar",
+      "time_us": 3.05,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.690758+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.23,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.694959+00:00",
+      "algorithm": "astar",
+      "time_us": 3.5,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.815690+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.64,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.818766+00:00",
+      "algorithm": "astar",
+      "time_us": 3.69,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.930074+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.59,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:56.933219+00:00",
+      "algorithm": "astar",
+      "time_us": 3.36,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.042286+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 4.99,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.044898+00:00",
+      "algorithm": "astar",
+      "time_us": 3.36,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.164164+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.3,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.167181+00:00",
+      "algorithm": "astar",
+      "time_us": 3.64,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.322155+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 15.48,
+      "nodes_visited": 6,
+      "cost": 420.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.325635+00:00",
+      "algorithm": "astar",
+      "time_us": 7.74,
+      "nodes_visited": 2,
+      "cost": 420.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.438626+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.63,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.441167+00:00",
+      "algorithm": "astar",
+      "time_us": 4.8,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.559271+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.5,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.563335+00:00",
+      "algorithm": "astar",
+      "time_us": 3.35,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.697683+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 4.96,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.700168+00:00",
+      "algorithm": "astar",
+      "time_us": 3.15,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.819400+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.32,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.822361+00:00",
+      "algorithm": "astar",
+      "time_us": 4.46,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.951161+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.53,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:57.954153+00:00",
+      "algorithm": "astar",
+      "time_us": 4.15,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.077353+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.42,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.079803+00:00",
+      "algorithm": "astar",
+      "time_us": 4.94,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.215087+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.35,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.219144+00:00",
+      "algorithm": "astar",
+      "time_us": 4.83,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.363019+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 10.12,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.366041+00:00",
+      "algorithm": "astar",
+      "time_us": 4.87,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.482829+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.49,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.485299+00:00",
+      "algorithm": "astar",
+      "time_us": 3.63,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.612921+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.01,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.615830+00:00",
+      "algorithm": "astar",
+      "time_us": 3.09,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.724618+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.52,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.729256+00:00",
+      "algorithm": "astar",
+      "time_us": 3.53,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.861806+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.42,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:58.866479+00:00",
+      "algorithm": "astar",
+      "time_us": 5.61,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.002061+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.61,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.006342+00:00",
+      "algorithm": "astar",
+      "time_us": 5.08,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.117053+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.19,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.119691+00:00",
+      "algorithm": "astar",
+      "time_us": 3.51,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.257426+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.74,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.260333+00:00",
+      "algorithm": "astar",
+      "time_us": 3.18,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.372265+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.26,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.375383+00:00",
+      "algorithm": "astar",
+      "time_us": 2.96,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.496359+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 5.3,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.499297+00:00",
+      "algorithm": "astar",
+      "time_us": 2.95,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.615120+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.01,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.619109+00:00",
+      "algorithm": "astar",
+      "time_us": 3.36,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.740198+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 8.26,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.743056+00:00",
+      "algorithm": "astar",
+      "time_us": 4.59,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.880459+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.94,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:36:59.883943+00:00",
+      "algorithm": "astar",
+      "time_us": 3.47,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.016914+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.04,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.020310+00:00",
+      "algorithm": "astar",
+      "time_us": 3.44,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.146437+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.34,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.149456+00:00",
+      "algorithm": "astar",
+      "time_us": 3.35,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.295056+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 6.44,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.297987+00:00",
+      "algorithm": "astar",
+      "time_us": 3.52,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.430458+00:00",
+      "algorithm": "dijkstra",
+      "time_us": 7.18,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    },
+    {
+      "timestamp": "2026-03-31T23:37:00.434797+00:00",
+      "algorithm": "astar",
+      "time_us": 4.83,
+      "nodes_visited": 1,
+      "cost": 0.0,
+      "found": true
+    }
+  ]
+}
