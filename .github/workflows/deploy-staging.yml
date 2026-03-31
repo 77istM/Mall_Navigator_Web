@@ -1,0 +1,21 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [ staging ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - name: Trigger Streamlit Cloud staging deploy hook
+        env:
+          STREAMLIT_STAGING_DEPLOY_HOOK: ${{ secrets.STREAMLIT_STAGING_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$STREAMLIT_STAGING_DEPLOY_HOOK" ]; then
+            echo "STREAMLIT_STAGING_DEPLOY_HOOK is not configured"
+            exit 1
+          fi
+          curl -fsS -X POST "$STREAMLIT_STAGING_DEPLOY_HOOK"
