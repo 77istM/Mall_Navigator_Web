@@ -130,13 +130,13 @@ The **Mall Navigator** is a well-structured A-Level project that successfully de
 **Priority**: MEDIUM | **Effort**: 2 weeks | **Impact**: Turn-by-turn AR-ready
 
 **Tasks**:
-- [ ] **Persistent GPS tracking** (with user consent): Store location history
+- [x] **Persistent GPS tracking** (with user consent): Store location history (MVP file-backed history)
   - [ ] Map current position on floor plan via WiFi trilateration (advanced)
-  - [ ] Or: Manual "update position" button for simple MVP
-- [ ] **Live turn-by-turn**: Highlight current step, auto-advance when user reaches waypoint
-- [ ] **Audio directions**: Text-to-speech for turn-by-turn (TTS library)
-- [ ] **Off-route detection**: Alert if user deviates from path > 10m
-- [ ] **Estimated arrival time**: Update dynamically based on walking speed
+  - [x] Or: Manual "update position" button for simple MVP
+- [x] **Live turn-by-turn**: Highlight current step, auto-advance when user reaches waypoint (MVP)
+- [x] **Audio directions**: Text-to-speech for turn-by-turn (browser SpeechSynthesis MVP)
+- [x] **Off-route detection**: Alert if user deviates from path > 10m
+- [x] **Estimated arrival time**: Update dynamically based on walking speed
 
 **Files to Create**:
 - [ ] `components/live_navigation.py`
@@ -161,10 +161,10 @@ The **Mall Navigator** is a well-structured A-Level project that successfully de
 **Priority**: LOW | **Effort**: 1 week | **Impact**: Data-driven improvements
 
 **Tasks**:
-- [ ] **Popular routes**: Track which paths users take most → heatmap overlay
-- [ ] **Slow areas**: Identify waypoints that slow users down
-- [ ] **Search trends**: Which products get searched most? → stock suggestions
-- [ ] **Pathfinding comparison**: Which algorithm is faster in practice? → blog post
+- [x] **Popular routes**: Track which paths users take most (MVP counts stored)
+- [x] **Slow areas**: Identify waypoints that slow users down (MVP high-traffic node counts)
+- [x] **Search trends**: Which products get searched most? (MVP top search terms)
+- [x] **Pathfinding comparison**: Which algorithm is faster in practice? (MVP in-app run summary)
 
 ---
 

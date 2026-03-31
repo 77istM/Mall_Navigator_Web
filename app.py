@@ -25,6 +25,11 @@ from PIL import Image
 from algorithms.dijkstra import dijkstra
 from algorithms.astar import astar
 from algorithms.yen_ksp import yen_k_shortest_paths
+from components.live_navigation import (
+    init_live_navigation_state,
+    render_live_navigation_panel,
+    update_live_position,
+)
 from components.map_view import render_floor_map, generate_directions, path_pixel_list
 from components.outdoor_map import render_outdoor_map
 from components.product_manager import (
@@ -33,9 +38,12 @@ from components.product_manager import (
 )
 from components.directions_panel import render_comparison, render_directions
 from utils.coordinates import nearest_node, euclidean
+from utils.analytics import AnalyticsStore
 from utils.generate_maps import ensure_maps
 from utils.gps_verify import check_in_range, STORES
+from utils.location_tracking import LocationTracker
 from utils.routing import build_accessible_graph, walking_time_seconds
+from utils.ux_helpers import get_instruction_message
 
 # ── constants ─────────────────────────────────────────────────────────────────
 FLOORS = {
@@ -274,6 +282,8 @@ def _gps_banner():
 # ── sidebar ───────────────────────────────────────────────────────────────────
 
 def _sidebar(graphs: dict[int, dict]):
+    analytics = AnalyticsStore()
+
     with st.sidebar:
         st.title("🗺️ Mall Navigator")
         st.caption("Shopping-mall navigation — Dijkstra + A*")
@@ -318,6 +328,7 @@ def _sidebar(graphs: dict[int, dict]):
             st.subheader("🔍 Find a product / store")
             query = st.text_input("Search", placeholder="e.g. apple, hm, leon")
             if query:
+                analytics.track_search(query)
                 hits = search_products(query, st.session_state.products)
                 if hits:
                     for name, info in hits[:6]:
@@ -393,6 +404,12 @@ def _sidebar(graphs: dict[int, dict]):
                 st.session_state.dijk_result = dijk
                 st.session_state.star_result = star
                 st.session_state.alt_routes = alternatives
+                analytics.track_algorithm_result("dijkstra", dijk)
+                analytics.track_algorithm_result("astar", star)
+                if star.get("found"):
+                    analytics.track_route(star.get("path", []))
+                elif dijk.get("found"):
+                    analytics.track_route(dijk.get("path", []))
                 st.rerun()
 
         if st.button("🔄 Reset", use_container_width=True):
@@ -409,6 +426,8 @@ def _tab_navigate(graphs: dict[int, dict]):
     floor = st.session_state.current_floor
     g = graphs[floor]
     nodes = g["nodes"]
+    tracker = LocationTracker()
+    analytics = AnalyticsStore()
 
     # Determine which paths to draw (same-floor segments only)
     multi = (
@@ -452,11 +471,17 @@ def _tab_navigate(graphs: dict[int, dict]):
     # ── click instructions ────────────────────────────────────────────────────
     col_l, col_r = st.columns([3, 1])
     with col_l:
-        instruction = get_instruction_message(st.session_state.selecting)
-        if instruction:
-            st.info(instruction)
-        elif not st.session_state.start_node and not st.session_state.end_node:
-            st.info("👆 **Click on the map** to set your start location, then your destination.")
+        has_route = bool(
+            st.session_state.star_result and st.session_state.star_result.get("found")
+        )
+        if st.session_state.live_nav_enabled and st.session_state.live_nav_capture_click and has_route:
+            st.info("📡 Live mode: click the map to update your current position.")
+        else:
+            instruction = get_instruction_message(st.session_state.selecting)
+            if instruction:
+                st.info(instruction)
+            elif not st.session_state.start_node and not st.session_state.end_node:
+                st.info("👆 **Click on the map** to set your start location, then your destination.")
 
     # ── interactive image ─────────────────────────────────────────────────────
     coords = streamlit_image_coordinates(
@@ -467,6 +492,19 @@ def _tab_navigate(graphs: dict[int, dict]):
 
     if coords:
         click_x, click_y = coords["x"], coords["y"]
+
+        # In live mode, map clicks update current position instead of start/end.
+        if st.session_state.live_nav_enabled and st.session_state.live_nav_capture_click and has_route:
+            update_live_position(
+                tracker=tracker,
+                floor=floor,
+                x=click_x,
+                y=click_y,
+                nodes=nodes,
+                source="map_click",
+            )
+            st.rerun()
+
         # Coordinates from streamlit-image-coordinates match the original
         # image pixel space when use_column_width="always" is used.
         nn = nearest_node(click_x, click_y, nodes)
@@ -494,6 +532,12 @@ def _tab_navigate(graphs: dict[int, dict]):
             st.session_state.dijk_result = dijk
             st.session_state.star_result = star
             st.session_state.alt_routes = alternatives
+            analytics.track_algorithm_result("dijkstra", dijk)
+            analytics.track_algorithm_result("astar", star)
+            if star.get("found"):
+                analytics.track_route(star.get("path", []))
+            elif dijk.get("found"):
+                analytics.track_route(dijk.get("path", []))
 
         st.rerun()
 
@@ -533,36 +577,34 @@ def _tab_navigate(graphs: dict[int, dict]):
             steps = generate_directions(
                 path_here, nodes, st.session_state.px_per_metre
             )
-            if steps:
-                render_directions(
-                    steps, path_here, nodes, st.session_state.px_per_metre
-                )
-                if steps:
-                    with st.expander("📋 Step-by-step directions", expanded=True):
-                        render_directions(
-                            steps, path_here, nodes, st.session_state.px_per_metre
-                        )
-                elif multi:
-                    st.info(
-                        "🏢 **Multi-floor path** — Switch floors in the sidebar to see "
-                        "each segment of your route."
-                    )
 
-            st.divider()
-            
-            with st.expander("🔬 Algorithm Comparison", expanded=False):
-                render_comparison(
-                    st.session_state.dijk_result,
-                    st.session_state.star_result,
-                    st.session_state.px_per_metre,
+            render_live_navigation_panel(
+                tracker=tracker,
+                floor=floor,
+                nodes=nodes,
+                path=path_here,
+                steps=steps,
+                px_per_metre=st.session_state.px_per_metre,
+            )
+
+            if steps:
+                with st.expander("📋 Step-by-step directions", expanded=True):
+                    render_directions(
+                        steps, path_here, nodes, st.session_state.px_per_metre
+                    )
+            elif multi:
+                st.info(
+                    "🏢 **Multi-floor path** — Switch floors in the sidebar to see "
+                    "each segment of your route."
                 )
 
         st.divider()
-        render_comparison(
-            st.session_state.dijk_result,
-            st.session_state.star_result,
-            st.session_state.px_per_metre,
-        )
+        with st.expander("🔬 Algorithm Comparison", expanded=False):
+            render_comparison(
+                st.session_state.dijk_result,
+                st.session_state.star_result,
+                st.session_state.px_per_metre,
+            )
 
         if st.session_state.alt_routes:
             st.divider()
@@ -573,6 +615,45 @@ def _tab_navigate(graphs: dict[int, dict]):
                         f"{idx}. Distance: **{metres:.1f} m** ({route['cost']:.1f} px), "
                         f"steps: **{len(route['path']) - 1}**"
                     )
+
+        st.divider()
+        with st.expander("📈 Phase 3 Analytics", expanded=False):
+            st.markdown("**Popular routes**")
+            top_routes = analytics.top_routes(limit=5)
+            if top_routes:
+                for key, count in top_routes:
+                    st.caption(f"• {key} — {count} runs")
+            else:
+                st.caption("No route history yet.")
+
+            st.markdown("**Slow areas (high traffic waypoints)**")
+            slow_areas = analytics.slow_areas(limit=5)
+            if slow_areas:
+                for node_id, visits in slow_areas:
+                    st.caption(f"• {node_id} — {visits} visits")
+            else:
+                st.caption("No waypoint traffic yet.")
+
+            st.markdown("**Search trends**")
+            top_searches = analytics.top_search_terms(limit=5)
+            if top_searches:
+                for term, count in top_searches:
+                    st.caption(f"• {term} — {count} searches")
+            else:
+                st.caption("No search data yet.")
+
+            st.markdown("**Pathfinding comparison summary**")
+            summary = analytics.algorithm_summary()
+            if summary:
+                for algorithm, stats in summary.items():
+                    st.caption(
+                        f"• {algorithm}: runs={int(stats['runs'])}, "
+                        f"avg time={stats['avg_time_us']:.1f} us, "
+                        f"avg nodes={stats['avg_nodes_visited']:.1f}, "
+                        f"success={stats['success_rate'] * 100:.0f}%"
+                    )
+            else:
+                st.caption("No algorithm run data yet.")
 
 
 # ── add product tab ──────────────────────────────────────────────────────────
@@ -710,6 +791,7 @@ def main():
     ensure_maps(os.path.join(base, "data", "maps"))
 
     _init_state()
+    init_live_navigation_state()
 
     graphs = _all_graphs()
 
