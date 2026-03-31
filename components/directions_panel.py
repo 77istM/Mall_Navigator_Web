@@ -5,6 +5,7 @@ Renders:
   2. Side-by-side Dijkstra vs A* statistics table
 """
 import math
+from typing import Dict, List
 import streamlit as st
 
 from utils.coordinates import walking_time_str, metres_str
@@ -16,8 +17,8 @@ DEFAULT_PX_PER_M = 10.0
 
 
 def render_comparison(
-    dijk_result: dict,
-    astar_result: dict,
+    dijk_result: Dict[str, float | int | bool | List],
+    astar_result: Dict[str, float | int | bool | List],
     px_per_metre: float = DEFAULT_PX_PER_M,
 ) -> None:
     """
@@ -33,7 +34,7 @@ def render_comparison(
 
     col1, col2 = st.columns(2)
 
-    def _render_algo(col, label: str, colour: str, result: dict):
+    def _render_algo(col, label: str, colour: str, result: Dict[str, float | int | bool | List]) -> None:
         with col:
             st.markdown(f"### {label}")
             if not result["found"]:
@@ -77,9 +78,9 @@ explores far fewer nodes.
 
 
 def render_directions(
-    steps: list[dict],
-    path: list[str],
-    nodes: dict,
+    steps: List[Dict[str, str | float | bool]],
+    path: List[str],
+    nodes: Dict[str, Dict],
     px_per_metre: float = DEFAULT_PX_PER_M,
 ) -> None:
     """

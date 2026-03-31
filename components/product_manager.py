@@ -15,6 +15,7 @@ Products are stored in data/products.json as:
 import json
 import os
 from datetime import datetime
+from typing import Dict, Tuple
 
 from utils.coordinates import nearest_node as _nearest_node
 
@@ -23,7 +24,7 @@ _PRODUCTS_FILE = os.path.join(
 )
 
 
-def load_products() -> dict:
+def load_products() -> Dict[str, Dict]:
     """Load and return the full product cache dict."""
     path = os.path.normpath(_PRODUCTS_FILE)
     if os.path.exists(path):
@@ -32,7 +33,7 @@ def load_products() -> dict:
     return {}
 
 
-def save_products(products: dict) -> None:
+def save_products(products: Dict[str, Dict]) -> None:
     """Persist the product cache to disk."""
     path = os.path.normpath(_PRODUCTS_FILE)
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -45,9 +46,9 @@ def add_product(
     floor: int,
     x: float,
     y: float,
-    nodes_for_floor: dict,
+    nodes_for_floor: Dict,
     note: str = "",
-) -> tuple[dict, str]:
+) -> Tuple[Dict[str, Dict], str]:
     """
     Add or overwrite a product entry.
 
@@ -68,7 +69,7 @@ def add_product(
     return products, nn
 
 
-def delete_product(name: str) -> dict:
+def delete_product(name: str) -> Dict[str, Dict]:
     """Remove a product from the cache. Returns updated dict."""
     products = load_products()
     key = name.lower().strip()
@@ -77,7 +78,7 @@ def delete_product(name: str) -> dict:
     return products
 
 
-def search_products(query: str, products: dict | None = None) -> list[tuple[str, dict]]:
+def search_products(query: str, products: Dict[str, Dict] | None = None) -> list[Tuple[str, Dict]]:
     """
     Case-insensitive partial-match search.
 
@@ -94,7 +95,7 @@ def search_products(query: str, products: dict | None = None) -> list[tuple[str,
     return exact + sorted(partial, key=lambda t: t[0])
 
 
-def products_for_floor(floor: int, products: dict | None = None) -> dict:
+def products_for_floor(floor: int, products: Dict[str, Dict] | None = None) -> Dict[str, Dict]:
     """Return only products on the given floor."""
     if products is None:
         products = load_products()
