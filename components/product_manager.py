@@ -25,7 +25,7 @@ def _build_store():
 _PRODUCT_STORE = _build_store()
 
 
-def load_products() -> dict:
+def load_products() -> Dict[str, Dict]:
     """Load and return the full product cache dict."""
     return _PRODUCT_STORE.load_all()
 
@@ -41,7 +41,7 @@ def add_product(
     floor: int,
     x: float,
     y: float,
-    nodes_for_floor: dict,
+    nodes_for_floor: Dict,
     note: str = "",
     opening_hours: str = "",
     category: str = "",
@@ -65,7 +65,7 @@ def add_product(
     return products, nn
 
 
-def delete_product(name: str) -> dict:
+def delete_product(name: str) -> Dict[str, Dict]:
     """Remove a product from the cache. Returns updated dict."""
     products = load_products()
     key = name.lower().strip()
@@ -86,7 +86,7 @@ def search_products(query: str, products: dict | None = None) -> list[tuple[str,
     return exact + sorted(partial, key=lambda t: t[0])
 
 
-def products_for_floor(floor: int, products: dict | None = None) -> dict:
+def products_for_floor(floor: int, products: Dict[str, Dict] | None = None) -> Dict[str, Dict]:
     """Return only products on the given floor."""
     if products is None:
         products = load_products()

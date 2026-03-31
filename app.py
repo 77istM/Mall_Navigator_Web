@@ -45,20 +45,21 @@ FLOORS = {
 }
 FLOOR_NAMES = {k: v["name"] for k, v in FLOORS.items()}
 
-# Inter-floor transition edges (stairs/escalators).
-# Key: (floor_a, node_a, floor_b, node_b), value: cost in pixels.
-INTER_FLOOR_EDGES = [
-    (0, "stairs_to_ground",   1, "stairs_to_lower",   200),
-    (1, "stairs_to_upper",    2, "stairs_from_ground", 200),
-]
+# ── configuration imports ─────────────────────────────────────────────────────
+from config import (
+    PAGE_TITLE, PAGE_ICON, PAGE_LAYOUT, INITIAL_SIDEBAR_STATE,
+    FLOORS, FLOOR_NAMES, INTER_FLOOR_EDGES,
+    STORES, MODES, DEFAULT_FLOOR, DEFAULT_MODE, DEFAULT_PX_PER_METRE,
+    PX_PER_METRE_MIN, PX_PER_METRE_MAX, PX_PER_METRE_STEP,
+)
 
 
 # ── page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Mall Navigator",
-    page_icon="🗺️",
-    layout="wide",
-    initial_sidebar_state="expanded",
+    page_title=PAGE_TITLE,
+    page_icon=PAGE_ICON,
+    layout=PAGE_LAYOUT,
+    initial_sidebar_state=INITIAL_SIDEBAR_STATE,
 )
 
 
@@ -104,28 +105,35 @@ def _build_combined_graph(graphs: dict[int, dict]) -> tuple[dict, dict]:
 
     Node ids are prefixed with the floor index: e.g. "1:apple_store".
     Returns (combined_edges, combined_node_coords).
+    
+    This function is called infrequently and the combined graph is relatively
+    small, so caching provides modest benefits but improves responsiveness.
     """
-    edges: dict[str, dict[str, float]] = {}
-    coords: dict[str, dict] = {}
+    @st.cache_data(show_spinner=False)
+    def _build_cached():
+        edges: dict[str, dict[str, float]] = {}
+        coords: dict[str, dict] = {}
 
-    for floor_idx, g in graphs.items():
-        for nid, nd in g["nodes"].items():
-            key = f"{floor_idx}:{nid}"
-            coords[key] = nd
-            edges.setdefault(key, {})
-        for nid, neighbours in g["edges"].items():
-            key = f"{floor_idx}:{nid}"
-            for nb, w in neighbours.items():
-                edges[key][f"{floor_idx}:{nb}"] = w
+        for floor_idx, g in graphs.items():
+            for nid, nd in g["nodes"].items():
+                key = f"{floor_idx}:{nid}"
+                coords[key] = nd
+                edges.setdefault(key, {})
+            for nid, neighbours in g["edges"].items():
+                key = f"{floor_idx}:{nid}"
+                for nb, w in neighbours.items():
+                    edges[key][f"{floor_idx}:{nb}"] = w
 
-    # Add inter-floor stair edges
-    for fa, na, fb, nb, cost in INTER_FLOOR_EDGES:
-        ka, kb = f"{fa}:{na}", f"{fb}:{nb}"
-        if ka in edges and kb in edges:
-            edges[ka][kb] = cost
-            edges[kb][ka] = cost
+        # Add inter-floor stair edges
+        for fa, na, fb, nb, cost in INTER_FLOOR_EDGES:
+            ka, kb = f"{fa}:{na}", f"{fb}:{nb}"
+            if ka in edges and kb in edges:
+                edges[ka][kb] = cost
+                edges[kb][ka] = cost
 
-    return edges, coords
+        return edges, coords
+    
+    return _build_cached()
 
 
 def _run_pathfinding(
@@ -191,7 +199,7 @@ def _pil_to_bytes(img: Image.Image) -> bytes:
 
 def _init_state():
     defaults = {
-        "current_floor": 1,          # start on ground floor
+        "current_floor": DEFAULT_FLOOR,
         "start_floor":   None,
         "start_node":    None,
         "end_floor":     None,
@@ -200,7 +208,7 @@ def _init_state():
         "dijk_result":   None,
         "star_result":   None,
         "products":      load_products(),
-        "px_per_metre":  10.0,
+        "px_per_metre":  DEFAULT_PX_PER_METRE,
         "show_wpts":     False,
         "accessible_mode": False,
         "k_routes":      3,
@@ -208,8 +216,8 @@ def _init_state():
         "gps_lng":       None,
         "gps_checked":   False,
         "store_key":     "asda_old_kent_road",
-        "tab":           "navigate",  # "navigate" | "add_product" | "outdoor"
-        "add_floor":     1,
+        "tab":           DEFAULT_MODE,
+        "add_floor":     DEFAULT_FLOOR,
         "add_x":         None,
         "add_y":         None,
         "add_name":      "",
@@ -285,9 +293,7 @@ def _sidebar(graphs: dict[int, dict]):
         st.divider()
 
         # Mode tabs
-        tab_labels = {"navigate": "🧭 Navigate", "add_product": "📌 Add Product",
-                      "outdoor": "🌍 Outdoor Map"}
-        for key, label in tab_labels.items():
+        for key, label in MODES.items():
             if st.button(label, use_container_width=True,
                          type="primary" if st.session_state.tab == key else "secondary"):
                 st.session_state.tab = key
@@ -340,8 +346,8 @@ def _sidebar(graphs: dict[int, dict]):
         with st.expander("⚙️ Settings"):
             st.session_state.px_per_metre = st.slider(
                 "Scale (px per metre)",
-                min_value=5.0, max_value=30.0,
-                value=st.session_state.px_per_metre, step=0.5,
+                min_value=PX_PER_METRE_MIN, max_value=PX_PER_METRE_MAX,
+                value=st.session_state.px_per_metre, step=PX_PER_METRE_STEP,
                 help="Calibrate to your floor plan. Default 10 px/m is approximate.",
             )
             st.session_state.show_wpts = st.checkbox(
@@ -444,12 +450,13 @@ def _tab_navigate(graphs: dict[int, dict]):
     )
 
     # ── click instructions ────────────────────────────────────────────────────
-    hint = {
-        "start": "🟢 Click the map to set your **start** position.",
-        "end":   "🔴 Click the map to set your **end / destination** position.",
-    }.get(st.session_state.selecting, "")
-    if hint:
-        st.info(hint)
+    col_l, col_r = st.columns([3, 1])
+    with col_l:
+        instruction = get_instruction_message(st.session_state.selecting)
+        if instruction:
+            st.info(instruction)
+        elif not st.session_state.start_node and not st.session_state.end_node:
+            st.info("👆 **Click on the map** to set your start location, then your destination.")
 
     # ── interactive image ─────────────────────────────────────────────────────
     coords = streamlit_image_coordinates(
@@ -530,9 +537,24 @@ def _tab_navigate(graphs: dict[int, dict]):
                 render_directions(
                     steps, path_here, nodes, st.session_state.px_per_metre
                 )
-            elif multi:
-                st.info(
-                    "Path crosses floors — switch floors to see each segment."
+                if steps:
+                    with st.expander("📋 Step-by-step directions", expanded=True):
+                        render_directions(
+                            steps, path_here, nodes, st.session_state.px_per_metre
+                        )
+                elif multi:
+                    st.info(
+                        "🏢 **Multi-floor path** — Switch floors in the sidebar to see "
+                        "each segment of your route."
+                    )
+
+            st.divider()
+            
+            with st.expander("🔬 Algorithm Comparison", expanded=False):
+                render_comparison(
+                    st.session_state.dijk_result,
+                    st.session_state.star_result,
+                    st.session_state.px_per_metre,
                 )
 
         st.divider()
