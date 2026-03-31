@@ -33,6 +33,10 @@ from components.directions_panel import render_comparison, render_directions
 from utils.coordinates import nearest_node, euclidean
 from utils.generate_maps import ensure_maps
 from utils.gps_verify import check_in_range
+from utils.ux_helpers import (
+    format_distance_summary, get_error_message, format_node_info,
+    format_path_info, get_instruction_message,
+)
 
 # ── configuration imports ─────────────────────────────────────────────────────
 from config import (
@@ -75,28 +79,35 @@ def _build_combined_graph(graphs: dict[int, dict]) -> tuple[dict, dict]:
 
     Node ids are prefixed with the floor index: e.g. "1:apple_store".
     Returns (combined_edges, combined_node_coords).
+    
+    This function is called infrequently and the combined graph is relatively
+    small, so caching provides modest benefits but improves responsiveness.
     """
-    edges: dict[str, dict[str, float]] = {}
-    coords: dict[str, dict] = {}
+    @st.cache_data(show_spinner=False)
+    def _build_cached():
+        edges: dict[str, dict[str, float]] = {}
+        coords: dict[str, dict] = {}
 
-    for floor_idx, g in graphs.items():
-        for nid, nd in g["nodes"].items():
-            key = f"{floor_idx}:{nid}"
-            coords[key] = nd
-            edges.setdefault(key, {})
-        for nid, neighbours in g["edges"].items():
-            key = f"{floor_idx}:{nid}"
-            for nb, w in neighbours.items():
-                edges[key][f"{floor_idx}:{nb}"] = w
+        for floor_idx, g in graphs.items():
+            for nid, nd in g["nodes"].items():
+                key = f"{floor_idx}:{nid}"
+                coords[key] = nd
+                edges.setdefault(key, {})
+            for nid, neighbours in g["edges"].items():
+                key = f"{floor_idx}:{nid}"
+                for nb, w in neighbours.items():
+                    edges[key][f"{floor_idx}:{nb}"] = w
 
-    # Add inter-floor stair edges
-    for fa, na, fb, nb, cost in INTER_FLOOR_EDGES:
-        ka, kb = f"{fa}:{na}", f"{fb}:{nb}"
-        if ka in edges and kb in edges:
-            edges[ka][kb] = cost
-            edges[kb][ka] = cost
+        # Add inter-floor stair edges
+        for fa, na, fb, nb, cost in INTER_FLOOR_EDGES:
+            ka, kb = f"{fa}:{na}", f"{fb}:{nb}"
+            if ka in edges and kb in edges:
+                edges[ka][kb] = cost
+                edges[kb][ka] = cost
 
-    return edges, coords
+        return edges, coords
+    
+    return _build_cached()
 
 
 def _run_pathfinding(
@@ -306,7 +317,8 @@ def _sidebar(graphs: dict[int, dict]):
         st.markdown(f"🔴 **End:** {e_lbl}")
 
         if st.session_state.start_node and st.session_state.end_node:
-            if st.button("🔍 Find Path", type="primary", use_container_width=True):
+            if st.button("🔍 Find Path", type="primary", use_container_width=True,
+                        help="Calculate shortest paths using both algorithms"):
                 dijk, star = _run_pathfinding(
                     st.session_state.start_floor,
                     st.session_state.start_node,
@@ -318,12 +330,22 @@ def _sidebar(graphs: dict[int, dict]):
                 st.session_state.star_result = star
                 st.rerun()
 
-        if st.button("🔄 Reset", use_container_width=True):
-            for k in ("start_node", "end_node", "start_floor", "end_floor",
-                      "dijk_result", "star_result"):
-                st.session_state[k] = None
-            st.session_state.selecting = "start"
-            st.rerun()
+        col_reset, col_clear = st.columns(2)
+        with col_reset:
+            if st.button("🔄 Reset", use_container_width=True,
+                        help="Clear all selections and start over"):
+                for k in ("start_node", "end_node", "start_floor", "end_floor",
+                          "dijk_result", "star_result"):
+                    st.session_state[k] = None
+                st.session_state.selecting = "start"
+                st.rerun()
+        
+        with col_clear:
+            if st.button("🗑️ Clear Path", use_container_width=True,
+                        help="Clear path results only"):
+                st.session_state.dijk_result = None
+                st.session_state.star_result = None
+                st.rerun()
 
 
 # ── navigate tab ─────────────────────────────────────────────────────────────
@@ -373,12 +395,13 @@ def _tab_navigate(graphs: dict[int, dict]):
     )
 
     # ── click instructions ────────────────────────────────────────────────────
-    hint = {
-        "start": "🟢 Click the map to set your **start** position.",
-        "end":   "🔴 Click the map to set your **end / destination** position.",
-    }.get(st.session_state.selecting, "")
-    if hint:
-        st.info(hint)
+    col_l, col_r = st.columns([3, 1])
+    with col_l:
+        instruction = get_instruction_message(st.session_state.selecting)
+        if instruction:
+            st.info(instruction)
+        elif not st.session_state.start_node and not st.session_state.end_node:
+            st.info("👆 **Click on the map** to set your start location, then your destination.")
 
     # ── interactive image ─────────────────────────────────────────────────────
     coords = streamlit_image_coordinates(
@@ -426,31 +449,67 @@ def _tab_navigate(graphs: dict[int, dict]):
     # ── results panel ─────────────────────────────────────────────────────────
     if st.session_state.dijk_result and st.session_state.star_result:
         st.divider()
-        # Directions (use A* path, same optimal cost as Dijkstra)
-        best = (st.session_state.star_result
-                if st.session_state.star_result["found"]
-                else st.session_state.dijk_result)
-        if best["found"]:
-            # For multi-floor, show directions for the current floor segment only
-            path_here = _path_for_floor(best["path"], floor, multi)
-            steps = generate_directions(
-                path_here, nodes, st.session_state.px_per_metre
-            )
-            if steps:
-                render_directions(
-                    steps, path_here, nodes, st.session_state.px_per_metre
-                )
-            elif multi:
-                st.info(
-                    "Path crosses floors — switch floors to see each segment."
-                )
-
-        st.divider()
-        render_comparison(
-            st.session_state.dijk_result,
-            st.session_state.star_result,
-            st.session_state.px_per_metre,
+        
+        # Check if paths were found
+        paths_found = (
+            st.session_state.dijk_result.get("found", False) and
+            st.session_state.star_result.get("found", False)
         )
+        
+        if not paths_found:
+            # Show helpful error message
+            error_msg = get_error_message(st.session_state.dijk_result)
+            if error_msg:
+                st.error(error_msg)
+        else:
+            # Show success summary with distance
+            with st.container():
+                col1, col2 = st.columns([2, 1])
+                with col1:
+                    summary = format_distance_summary(
+                        st.session_state.dijk_result,
+                        st.session_state.star_result,
+                        st.session_state.px_per_metre,
+                    )
+                    st.markdown(summary)
+                with col2:
+                    st.metric(
+                        "Est. walking time",
+                        f"{int(st.session_state.dijk_result['cost'] / st.session_state.px_per_metre / 1.4)} sec",  # ~1.4 m/s walking speed
+                        help="Approximate at typical walking speed"
+                    )
+            
+            st.divider()
+            
+            # Directions (use A* path, same optimal cost as Dijkstra)
+            best = (st.session_state.star_result
+                    if st.session_state.star_result["found"]
+                    else st.session_state.dijk_result)
+            if best["found"]:
+                # For multi-floor, show directions for the current floor segment only
+                path_here = _path_for_floor(best["path"], floor, multi)
+                steps = generate_directions(
+                    path_here, nodes, st.session_state.px_per_metre
+                )
+                if steps:
+                    with st.expander("📋 Step-by-step directions", expanded=True):
+                        render_directions(
+                            steps, path_here, nodes, st.session_state.px_per_metre
+                        )
+                elif multi:
+                    st.info(
+                        "🏢 **Multi-floor path** — Switch floors in the sidebar to see "
+                        "each segment of your route."
+                    )
+
+            st.divider()
+            
+            with st.expander("🔬 Algorithm Comparison", expanded=False):
+                render_comparison(
+                    st.session_state.dijk_result,
+                    st.session_state.star_result,
+                    st.session_state.px_per_metre,
+                )
 
 
 # ── add product tab ──────────────────────────────────────────────────────────
