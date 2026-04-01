@@ -10,7 +10,8 @@ built on **Streamlit** and deployable for free on
 📄 **[Full Academic Documentation (documentation.docx)](documentation.docx)** — comprehensive research report covering analysis, design, development, testing, evaluation, and future work.
 
 ---
-
+![alt text](image.png)
+---
 ## ✨ Features
 
 | Feature | Details |

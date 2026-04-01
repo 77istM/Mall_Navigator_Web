@@ -10,6 +10,7 @@ from utils.ml_features import PopularRoutesPredictor, NearbyRecommender
 
 def render_popular_routes_panel(
     route_predictor: PopularRoutesPredictor,
+    current_floor: int,
 ) -> None:
     """Render popular routes recommendations panel."""
     st.subheader("🔥 Popular Routes Right Now")
@@ -43,11 +44,31 @@ def render_popular_routes_panel(
                 key=f"popular_route_{i}",
                 use_container_width=True,
             ):
-                start, end = route.route_key.split("->")
-                st.session_state.start_node = start
-                st.session_state.end_node = end
-                st.session_state.should_route = True
-                st.success(f"✅ Route set: {start} → {end}")
+                start_raw, end_raw = route.route_key.split("->", maxsplit=1)
+
+                def _parse_route_point(value: str) -> tuple[int, str]:
+                    if ":" in value:
+                        floor_text, node_id = value.split(":", maxsplit=1)
+                        if floor_text.isdigit() and node_id:
+                            return int(floor_text), node_id
+                    return current_floor, value
+
+                start_floor, start_node = _parse_route_point(start_raw)
+                end_floor, end_node = _parse_route_point(end_raw)
+
+                st.session_state.start_floor = start_floor
+                st.session_state.start_node = start_node
+                st.session_state.end_floor = end_floor
+                st.session_state.end_node = end_node
+                st.session_state.current_floor = end_floor
+                st.session_state.selecting = "start"
+
+                # Route results are recalculated only when Find Path is pressed.
+                st.session_state.dijk_result = None
+                st.session_state.star_result = None
+                st.session_state.alt_routes = []
+
+                st.success(f"✅ Route set: {start_node} → {end_node}. Press Find Path to run navigation.")
 
 
 def render_nearby_recommendations_panel(
@@ -97,8 +118,25 @@ def render_nearby_recommendations_panel(
                 key=f"nearby_{product['product_id']}",
                 use_container_width=True,
             ):
+                product_node = min(
+                    nodes,
+                    key=lambda nid: (
+                        (float(nodes[nid]["x"]) - float(recommender.products[product["product_id"]]["x"])) ** 2
+                        + (float(nodes[nid]["y"]) - float(recommender.products[product["product_id"]]["y"])) ** 2
+                    ),
+                )
+
+                st.session_state.end_node = product_node
+                st.session_state.end_floor = int(product.get("floor", st.session_state.get("current_floor", 0)))
+                st.session_state.current_floor = st.session_state.end_floor
+                st.session_state.selecting = "start"
                 st.session_state.selected_product = product["product_id"]
-                st.success(f"✅ Navigating to {product['name']}")
+
+                st.session_state.dijk_result = None
+                st.session_state.star_result = None
+                st.session_state.alt_routes = []
+
+                st.success(f"✅ Destination set to {product['name']}. Press Find Path to run navigation.")
 
 
 def render_category_recommendations_panel(
@@ -196,5 +234,3 @@ def init_ml_session_state() -> None:
     """Initialize ML-related session state."""
     if "selected_product" not in st.session_state:
         st.session_state.selected_product = None
-    if "should_route" not in st.session_state:
-        st.session_state.should_route = False
