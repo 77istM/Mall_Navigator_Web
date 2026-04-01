@@ -22,29 +22,43 @@
       "info_desk->marks_spencer": 1,
       "stairs_to_upper->jct_south": 2,
       "jct_south->stairs_to_lower": 1
+    },
+    "00-04_Wednesday": {
+      "jct_south->marks_spencer": 1,
+      "apple_store->stairs_to_upper": 1,
+      "1:apple_store->2:wagamama": 4,
+      "stairs_to_upper->apple_store": 3,
+      "food_court->hm": 1
     }
   },
   "node_popularity": {
     "stairs_to_lower": 2,
-    "stairs_to_upper": 16,
-    "jct_south": 21,
-    "jct_center": 12,
-    "corridor_east": 10,
-    "marks_spencer": 7,
+    "stairs_to_upper": 20,
+    "jct_south": 26,
+    "jct_center": 18,
+    "corridor_east": 12,
+    "marks_spencer": 8,
     "entrance_gf": 7,
-    "apple_store": 3,
+    "apple_store": 7,
     "0:jct_center": 1,
     "0:corridor_east": 1,
     "0:stairs_to_ground": 1,
     "1:stairs_to_lower": 1,
-    "1:jct_south": 1,
-    "1:jct_center": 1,
+    "1:jct_south": 5,
+    "1:jct_center": 5,
     "1:corridor_east": 1,
     "1:marks_spencer": 1,
-    "food_court": 2,
+    "food_court": 3,
     "stairs_to_ground": 1,
     "jct_north": 2,
     "info_desk": 2,
-    "zara": 1
+    "zara": 1,
+    "1:apple_store": 4,
+    "1:stairs_to_upper": 4,
+    "2:stairs_from_ground": 4,
+    "2:jct_east_bottom": 4,
+    "2:jct_east_top": 4,
+    "2:wagamama": 4,
+    "hm": 1
   }
 }
