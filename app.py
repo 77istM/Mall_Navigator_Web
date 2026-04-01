@@ -272,6 +272,7 @@ def _init_state():
             "add_product": InMemoryRateLimiter(max_requests=10, window_seconds=60),
             "report_issue": InMemoryRateLimiter(max_requests=5, window_seconds=300),
         },
+        "last_map_click_sig": None,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -519,6 +520,7 @@ def _sidebar(graphs: dict[int, dict]):
             for k in ("start_node", "end_node", "start_floor", "end_floor"):
                 st.session_state[k] = None
             _clear_route_state()
+            st.session_state.last_map_click_sig = None
             st.session_state.selecting = "start"
             st.rerun()
 
@@ -585,6 +587,9 @@ def _tab_navigate(graphs: dict[int, dict]):
             elif not st.session_state.start_node and not st.session_state.end_node:
                 st.info("👆 **Click on the map** to set your start location, then your destination.")
 
+        if st.session_state.start_node and not st.session_state.end_node:
+            st.caption("Start set. Click again to set destination.")
+
     # ── interactive image ─────────────────────────────────────────────────────
     coords = streamlit_image_coordinates(
         img,
@@ -594,35 +599,44 @@ def _tab_navigate(graphs: dict[int, dict]):
 
     if coords:
         click_x, click_y = coords["x"], coords["y"]
+        click_sig = (floor, int(click_x), int(click_y))
 
-        # In live mode, map clicks update current position instead of start/end.
-        if st.session_state.live_nav_enabled and st.session_state.live_nav_capture_click and has_route:
-            update_live_position(
-                tracker=tracker,
-                floor=floor,
-                x=click_x,
-                y=click_y,
-                nodes=nodes,
-                source="map_click",
-            )
-            st.rerun()
-
-        # Coordinates from streamlit-image-coordinates match the original
-        # image pixel space when use_column_width="always" is used.
-        nn = nearest_node(click_x, click_y, nodes)
-
-        if st.session_state.selecting == "start":
-            st.session_state.start_node = nn
-            st.session_state.start_floor = floor
-            st.session_state.selecting = "end"
+        # streamlit-image-coordinates can return the same click on rerun;
+        # ignore duplicates so one click cannot set both start and end.
+        if st.session_state.last_map_click_sig == click_sig:
+            coords = None
         else:
-            st.session_state.end_node = nn
-            st.session_state.end_floor = floor
-            st.session_state.selecting = "start"
+            st.session_state.last_map_click_sig = click_sig
 
-        _clear_route_state()
+        if coords is not None:
+            # In live mode, map clicks update current position instead of start/end.
+            if st.session_state.live_nav_enabled and st.session_state.live_nav_capture_click and has_route:
+                update_live_position(
+                    tracker=tracker,
+                    floor=floor,
+                    x=click_x,
+                    y=click_y,
+                    nodes=nodes,
+                    source="map_click",
+                )
+                st.rerun()
 
-        st.rerun()
+            # Coordinates from streamlit-image-coordinates match the original
+            # image pixel space when use_column_width="always" is used.
+            nn = nearest_node(click_x, click_y, nodes)
+
+            if st.session_state.selecting == "start":
+                st.session_state.start_node = nn
+                st.session_state.start_floor = floor
+                st.session_state.selecting = "end"
+            else:
+                st.session_state.end_node = nn
+                st.session_state.end_floor = floor
+                st.session_state.selecting = "start"
+
+            _clear_route_state()
+
+            st.rerun()
 
     st.caption(
         "🟠 Orange = Dijkstra path &nbsp;|&nbsp; "
