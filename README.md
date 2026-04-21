@@ -34,11 +34,18 @@ built on **Streamlit** and deployable for free on
 git clone https://github.com/77istM/Alevel_cs_project2023.git
 cd Alevel_cs_project2023
 
-# 2. Install dependencies
+# 2. Create and activate a virtual environment
+python -m venv .venv
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+# macOS/Linux
+# source .venv/bin/activate
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# 3. Run locally
-python3 -m streamlit run app.py
+# 4. Run locally
+python -m streamlit run app.py
 ```
 
 Open `http://localhost:8501` in your browser.
