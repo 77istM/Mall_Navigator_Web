@@ -29,16 +29,21 @@
       "1:apple_store->2:wagamama": 4,
       "stairs_to_upper->apple_store": 3,
       "food_court->hm": 1
+    },
+    "12-16_Tuesday": {
+      "jct_south->stairs_to_lower": 1,
+      "jct_south->marks_spencer": 1,
+      "entrance_gf->marks_spencer": 1
     }
   },
   "node_popularity": {
-    "stairs_to_lower": 2,
+    "stairs_to_lower": 3,
     "stairs_to_upper": 20,
-    "jct_south": 26,
-    "jct_center": 18,
-    "corridor_east": 12,
-    "marks_spencer": 8,
-    "entrance_gf": 7,
+    "jct_south": 29,
+    "jct_center": 20,
+    "corridor_east": 14,
+    "marks_spencer": 10,
+    "entrance_gf": 8,
     "apple_store": 7,
     "0:jct_center": 1,
     "0:corridor_east": 1,
