@@ -975,3 +975,4 @@ tornado.websocket.WebSocketClosedError
 2026-04-21 14:46:18,767 INFO mall_navigator {"ts": "2026-04-21T13:46:18.766985+00:00", "event": "pathfinding_run", "start_floor": 1, "end_floor": 1, "accessible_mode": false, "k_routes": 3, "graph_nodes": 34, "graph_edges": 86, "elapsed_ms": 0.13, "dijkstra_found": true, "astar_found": true}
 2026-04-21 14:46:18,828 INFO utils.ml_features Loaded ML training data from data\ml_training_data.json
 2026-04-21 14:46:29,109 INFO mall_navigator {"ts": "2026-04-21T13:46:29.109905+00:00", "event": "pathfinding_run", "start_floor": 1, "end_floor": 1, "accessible_mode": false, "k_routes": 3, "graph_nodes": 34, "graph_edges": 86, "elapsed_ms": 0.22, "dijkstra_found": true, "astar_found": true}
+2026-04-21 14:48:31,282 INFO mall_navigator {"ts": "2026-04-21T13:48:31.281983+00:00", "event": "app_session_started", "sentry_enabled": false}
