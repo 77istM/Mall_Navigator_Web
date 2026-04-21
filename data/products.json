@@ -78,5 +78,15 @@
     "opening_hours": "10:00-22:00",
     "category": "Food",
     "timestamp": "2024-01-01T00:00:00"
+  },
+  "bob": {
+    "floor": 1,
+    "x": 441,
+    "y": 446,
+    "nearest_node": "jct_center",
+    "note": "",
+    "opening_hours": "7-11",
+    "category": "Retail",
+    "timestamp": "2026-04-21T15:27:32"
   }
 }
