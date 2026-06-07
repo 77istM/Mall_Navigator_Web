@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sqlite3
 from pathlib import Path
 
 from utils import backup_sqlite_to_s3
@@ -15,9 +16,13 @@ def test_main_skips_when_bucket_is_missing(capsys, monkeypatch) -> None:
     assert "Skipping backup: missing S3 bucket" in capsys.readouterr().out
 
 
-def test_backup_sqlite_to_s3_uploads_snapshot(monkeypatch, tmp_path: Path) -> None:
+def test_creates_and_uploads_snapshot(monkeypatch, tmp_path: Path) -> None:
     db_path = tmp_path / "products.db"
-    db_path.write_text("sqlite-content", encoding="utf-8")
+    conn = sqlite3.connect(db_path)
+    conn.execute("CREATE TABLE products (id INTEGER PRIMARY KEY, name TEXT)")
+    conn.execute("INSERT INTO products(name) VALUES ('apple')")
+    conn.commit()
+    conn.close()
     uploaded: dict[str, str] = {}
 
     def fake_upload(file_path: Path, bucket: str, key: str, region: str | None) -> None:
