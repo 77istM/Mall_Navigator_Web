@@ -53,7 +53,8 @@ def main() -> int:
     args = parser.parse_args()
 
     if not args.bucket:
-        raise ValueError("Missing S3 bucket. Set --bucket or BACKUP_S3_BUCKET.")
+        print("Skipping backup: missing S3 bucket. Set --bucket or BACKUP_S3_BUCKET to enable uploads.")
+        return 0
 
     key = backup_sqlite_to_s3(
         db_path=Path(args.db_path),
