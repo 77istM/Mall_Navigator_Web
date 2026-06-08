@@ -15,7 +15,7 @@ jobs:
           STREAMLIT_DEPLOY_HOOK: ${{ secrets.STREAMLIT_DEPLOY_HOOK }}
         run: |
           if [ -z "$STREAMLIT_DEPLOY_HOOK" ]; then
-            echo "STREAMLIT_DEPLOY_HOOK is not configured"
-            exit 1
+            echo "::notice::STREAMLIT_DEPLOY_HOOK is not configured; skipping deploy trigger."
+            exit 0
           fi
           curl -fsS -X POST "$STREAMLIT_DEPLOY_HOOK"
